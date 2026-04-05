@@ -1,0 +1,196 @@
+DEBUG 2025-09-25 19:46:56.498 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-25 19:46:56.499 UTC: 	 Running on: Linux lxplus809.cern.ch 4.18.0-553.76.1.el8_10.x86_64 #1 SMP Mon Sep 15 14:04:30 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-25 19:46:56.499 UTC: 	 Not using Singularity
+DEBUG 2025-09-25 19:46:56.499 UTC: 	 Operating System: Red Hat Enterprise Linux 8.10 (Ootpa)
+DEBUG 2025-09-25 19:46:56.499 UTC: 	 Executing command: 'submit'
+DEBUG 2025-09-25 19:46:56.499 UTC: 	 Found CRAB cache file /afs/cern.ch/user/b/bibehera/.crab3
+INFO 2025-09-25 19:46:56.501 UTC: 	 Will use CRAB configuration file crab_config2.py
+DEBUG 2025-09-25 19:46:56.501 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-09-25 19:46:56.523 UTC: 	 Overriden parameter General.requestName with '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+DEBUG 2025-09-25 19:46:56.523 UTC: 	 Overriden parameter Data.inputDataset with '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER'
+DEBUG 2025-09-25 19:46:56.523 UTC: 	 Overriden parameter Data.secondaryInputDataset with '/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD'
+DEBUG 2025-09-25 19:46:56.523 UTC: 	 Overriden parameter Data.outputDatasetTag with '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+DEBUG 2025-09-25 19:46:56.523 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-09-25 19:46:56.533 UTC: 	 Checking credentials
+DEBUG 2025-09-25 19:46:56.533 UTC: 	 Found proxy file /tmp/x509up_u177753
+DEBUG 2025-09-25 19:46:56.533 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-09-25 19:46:56.533 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u177753
+DEBUG 2025-09-25 19:46:56.553 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-25 19:46:56.553 UTC: 	 Getting proxy life time left
+DEBUG 2025-09-25 19:46:56.553 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u177753
+DEBUG 2025-09-25 19:46:56.570 UTC: 	 output : 42767
+42767
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-25 19:46:56.571 UTC: 	 Proxy valid for 11:52:47 hours
+DEBUG 2025-09-25 19:46:56.571 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-09-25 19:46:56.605 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-09-25 19:46:56.606 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u177753
+DEBUG 2025-09-25 19:46:56.632 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-25 19:46:56.633 UTC: 	 Getting myproxy life time left for bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+DEBUG 2025-09-25 19:46:56.633 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 output : username: bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 385:11:57  (16.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 Myproxy is valid: 1386660
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: bfbdf12a5670e45fdd055ff115afbb0f25b8a072  - validity: 16 days, 1:11:00
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 Command use: submit
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 Options use: ['-c', 'crab_config2.py', 'General.requestName=2pc_OO_V0_IM_effcorr_cent0to60_IP16', 'Data.inputDataset=/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER', 'Data.secondaryInputDataset=/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD', 'Data.outputDatasetTag=2pc_OO_V0_IM_effcorr_cent0to60_IP16']
+DEBUG 2025-09-25 19:46:56.934 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Instance is prod
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Command api workflow
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Started submission
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Working on /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16
+DEBUG 2025-09-25 19:46:56.966 UTC: 	 Encoded data for curl request: subresource=backendurls
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 Found CMSSW_15_0_6_patch1 for el8_amd64_gcc12 with base /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 Found CMSSW_15_0_6_patch1 for el8_amd64_gcc12 with base /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 UNIQUE NAME: tarUUID e660373b-4ecc-4823-9f09-9eb417de7a32 
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.workArea = 'OO_Data_MINIAOD'
+config.General.requestName = '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+config.General.transferLogs = True
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+config.JobType.psetName = 'PbPb_2018_cfg.py'
+config.section_('Data')
+config.Data.publication = False
+config.Data.lumiMask = 'generated_json.json'
+config.Data.unitsPerJob = 3
+config.Data.totalUnits = -1
+config.Data.inputDataset = '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER'
+config.Data.inputDBS = 'phys03'
+config.Data.outLFNDirBase = '/store/user/bibehera/'
+config.Data.secondaryInputDataset = '/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD'
+config.Data.outputDatasetTag = '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+config.Data.splitting = 'LumiBased'
+config.section_('Site')
+config.Site.storageSite = 'T3_CH_CERNBOX'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2025-09-25 19:46:57.021 UTC: 	 self.config.JobType.psetName: PbPb_2018_cfg.py
+INFO 2025-09-25 19:46:57.021 UTC: 	 Importing CMSSW configuration PbPb_2018_cfg.py
+INFO 2025-09-25 19:46:57.762 UTC: 	 Finished importing CMSSW configuration PbPb_2018_cfg.py
+DEBUG 2025-09-25 19:46:57.762 UTC: 	 Writing CMSSW configuration to /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/PSet.py
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 The following EDM output files will be collected: []
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 The following TFile output files will be collected: ['V0_test_IM_wgt.root']
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 The following user output files (not listed as PoolOuputModule or TFileService in the CMSSW PSet) will be collected: 
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 Found CMSSW_15_0_6_patch1 for el8_amd64_gcc12 with base /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1
+DEBUG 2025-09-25 19:46:57.801 UTC: 	 Making tarball in /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/e660373b-4ecc-4823-9f09-9eb417de7a32default.tgz
+DEBUG 2025-09-25 19:46:57.803 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/bin
+DEBUG 2025-09-25 19:46:57.803 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/bin to tarball
+DEBUG 2025-09-25 19:46:57.806 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/python
+DEBUG 2025-09-25 19:46:57.806 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/python to tarball
+DEBUG 2025-09-25 19:46:57.842 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/cfipython
+DEBUG 2025-09-25 19:46:57.842 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/cfipython to tarball
+DEBUG 2025-09-25 19:46:57.945 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/lib
+DEBUG 2025-09-25 19:46:57.945 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/lib to tarball
+DEBUG 2025-09-25 19:46:58.119 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/biglib
+DEBUG 2025-09-25 19:46:58.119 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/biglib to tarball
+DEBUG 2025-09-25 19:46:58.121 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/module
+DEBUG 2025-09-25 19:46:58.121 UTC: 	 Checking directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/config/SCRAM/hooks
+DEBUG 2025-09-25 19:46:58.121 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/config/SCRAM/hooks to tarball
+DEBUG 2025-09-25 19:46:58.298 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/data to tarball
+DEBUG 2025-09-25 19:46:58.696 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/interface to tarball
+DEBUG 2025-09-25 19:46:58.700 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/python to tarball
+DEBUG 2025-09-25 19:46:58.706 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/Configuration/data to tarball
+DEBUG 2025-09-25 19:46:58.983 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/Configuration/python to tarball
+DEBUG 2025-09-25 19:46:59.005 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/EGMAnalysis/data to tarball
+DEBUG 2025-09-25 19:46:59.009 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/EGMAnalysis/interface to tarball
+DEBUG 2025-09-25 19:46:59.012 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/EGMAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.018 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/EventAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.081 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/JetAnalysis/interface to tarball
+DEBUG 2025-09-25 19:46:59.084 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/JetAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.111 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/MuonAnalysis/interface to tarball
+DEBUG 2025-09-25 19:46:59.114 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/MuonAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.121 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/TrackAnalysis/interface to tarball
+DEBUG 2025-09-25 19:46:59.123 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/TrackAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.141 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/VertexAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.144 UTC: 	 Adding directory /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/HeavyIonsAnalysis/ZDCAnalysis/python to tarball
+DEBUG 2025-09-25 19:46:59.197 UTC: 	 Uploading archive /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/e660373b-4ecc-4823-9f09-9eb417de7a32default.tgz (3.924805.1 MB) to the CRAB cache. Using URI https://cmsweb.cern.ch/S3/crabcache_prod
+DEBUG 2025-09-25 19:46:59.952 UTC: 	 Encoded data for curl request: subresource=upload&objecttype=sandbox&tarballname=b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz
+DEBUG 2025-09-25 19:46:59.990 UTC: 	 sandbox b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz is already in the S3 store, will not upload again
+DEBUG 2025-09-25 19:46:59.990 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-25 19:46:59.990 UTC: 	 Found CMSSW_15_0_6_patch1 for el8_amd64_gcc12 with base /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1
+DEBUG 2025-09-25 19:46:59.990 UTC: 	 Making tarball in /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/debugFiles.tgz
+DEBUG 2025-09-25 19:47:00.022 UTC: 	 Uploading archive /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/debugFiles.tgz (3 KB) to the CRAB cache. Using URI https://cmsweb.cern.ch/S3/crabcache_prod
+DEBUG 2025-09-25 19:47:00.029 UTC: 	 Encoded data for curl request: subresource=upload&objecttype=sandbox&tarballname=bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz
+DEBUG 2025-09-25 19:47:00.067 UTC: 	 Will execute:
+curl -f -v -X POST  -H "User-Agent: CRAB" -F "key=bibehera/sandboxes/bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz" -F "AWSAccessKeyId=715203df6482458ba839e73e6dab634b" -F "policy=eyJleHBpcmF0aW9uIjogIjIwMjUtMDktMjVUMjA6NDc6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiY3JhYmNhY2hlX3Byb2QifSwgeyJrZXkiOiAiYmliZWhlcmEvc2FuZGJveGVzL2JlZTQ0MDE0MDQwMDI2OGU4OTU3ZjU1OGQzNDdjYmRjNjVjZjA1NzhmMTJlNTM3MWIwODYxNjUyN2I0YjA2MzIudGFyLmd6In1dfQ==" -F "signature=LdGTRjYHXQ7VmyD3YE+tTs8Zgbw=" -F "file=@/eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/debugFiles.tgz" "https://s3.cern.ch/crabcache_prod"
+DEBUG 2025-09-25 19:47:00.138 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-25 19:47:00.138 UTC: 	 upload to S3 of sandbox /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/debugFiles.tgz completed
+DEBUG 2025-09-25 19:47:00.138 UTC: 	 make sure that object is ready for retrieve
+DEBUG 2025-09-25 19:47:01.139 UTC: 	 Encoded data for curl request: subresource=download&objecttype=sandbox&tarballname=bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz&clientmethod=head_object
+DEBUG 2025-09-25 19:47:01.179 UTC: 	 PreSignedUrl to download sandbox received OK
+DEBUG 2025-09-25 19:47:01.184 UTC: 	 Will execute:
+ curl -v -s -f -o /dev/null --head  "https://s3.cern.ch/crabcache_prod/bibehera/sandboxes/bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz?AWSAccessKeyId=715203df6482458ba839e73e6dab634b&Signature=%2Fq%2Fx7sevK6D3s0Rd16flBJFgOfs%3D&Expires=1758833221"
+DEBUG 2025-09-25 19:47:01.211 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-25 19:47:01.211 UTC: 	 sandbox /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/inputs/debugFiles.tgz successfully uploaded to S3
+DEBUG 2025-09-25 19:47:01.211 UTC: 	 Result uploading input files: b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz 
+DEBUG 2025-09-25 19:47:01.211 UTC: 	 Attaching lumi mask generated_json.json to the request
+DEBUG 2025-09-25 19:47:01.211 UTC: 	 Reading lumi-mask from generated_json.json
+DEBUG 2025-09-25 19:47:01.213 UTC: 	 submit() - self.configuration from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.workArea = 'OO_Data_MINIAOD'
+config.General.requestName = '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+config.General.transferLogs = True
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+config.JobType.psetName = 'PbPb_2018_cfg.py'
+config.section_('Data')
+config.Data.publication = False
+config.Data.lumiMask = 'generated_json.json'
+config.Data.unitsPerJob = 3
+config.Data.totalUnits = -1
+config.Data.inputDataset = '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER'
+config.Data.inputDBS = 'phys03'
+config.Data.outLFNDirBase = '/store/user/bibehera/'
+config.Data.secondaryInputDataset = '/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD'
+config.Data.outputDatasetTag = '2pc_OO_V0_IM_effcorr_cent0to60_IP16'
+config.Data.splitting = 'LumiBased'
+config.section_('Site')
+config.Site.storageSite = 'T3_CH_CERNBOX'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2025-09-25 19:47:01.213 UTC: 	 submit() - self.configreq {'dryrun': 0, 'workflow': 'crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16', 'saveoutput': 1, 'savelogsflag': 1, 'inputdata': '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER', 'nonvaliddata': 0, 'userfiles': [], 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader', 'useparent': 0, 'secondarydata': '/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD', 'ignorelocality': 0, 'splitalgo': 'LumiBased', 'algoargs': 3, 'totalunits': -1, 'lfn': '/store/user/bibehera/', 'publication': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'publishname2': '2pc_OO_V0_IM_effcorr_cent0to60_IP16', 'jobtype': 'Analysis', 'generator': 'pythia', 'addoutputfiles': [], 'maxjobruntime': 1250, 'numcores': 1, 'maxmemory': 2000, 'priority': 10, 'nonprodsw': 0, 'asyncdest': 'T3_CH_CERNBOX', 'requireaccelerator': 0, 'oneEventMode': 0, 'extrajdl': [], 'ignoreglobalblacklist': 0, 'partialdataset': 0, 'inputblocks': []}
+DEBUG 2025-09-25 19:47:01.213 UTC: 	 submit() - jobconfig {'addoutputfiles': [], 'tfileoutfiles': ['V0_test_IM_wgt.root'], 'edmoutfiles': [], 'jobarch': 'el8_amd64_gcc12', 'jobminuarch': 'x86-64-v3', 'jobsw': 'CMSSW_15_0_6_patch1', 'inputdata': '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER', 'cacheurl': 'https://cmsweb.cern.ch/S3/crabcache_prod', 'cachefilename': 'b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz', 'debugfilename': 'bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz', 'runs': ['394153', '394154', '394169', '394175', '394183', '394184', '394185', '394186', '394187', '394188', '394189', '394204', '394209', '394217'], 'lumis': ['40,169', '1,886', '39,997', '47,988', '15,239', '1,667', '1,3', '1,15', '1,1', '1,107', '1,72', '38,932', '23,1209', '41,838'], 'jobtype': 'Analysis'}
+INFO 2025-09-25 19:47:01.213 UTC: 	 Sending the request to the server at cmsweb.cern.ch
+DEBUG 2025-09-25 19:47:01.213 UTC: 	 Submitting {'dryrun': 0, 'workflow': 'crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16', 'saveoutput': 1, 'savelogsflag': 1, 'inputdata': '/IonPhysics16/bibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617/USER', 'nonvaliddata': 0, 'userfiles': [], 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader', 'useparent': 0, 'secondarydata': '/IonPhysics16/OORun2025-PromptReco-v1/MINIAOD', 'ignorelocality': 0, 'splitalgo': 'LumiBased', 'algoargs': 3, 'totalunits': -1, 'lfn': '/store/user/bibehera/', 'publication': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'publishname2': '2pc_OO_V0_IM_effcorr_cent0to60_IP16', 'jobtype': 'Analysis', 'generator': 'pythia', 'addoutputfiles': [], 'maxjobruntime': 1250, 'numcores': 1, 'maxmemory': 2000, 'priority': 10, 'nonprodsw': 0, 'asyncdest': 'T3_CH_CERNBOX', 'requireaccelerator': 0, 'oneEventMode': 0, 'extrajdl': [], 'ignoreglobalblacklist': 0, 'partialdataset': 0, 'inputblocks': [], 'tfileoutfiles': ['V0_test_IM_wgt.root'], 'edmoutfiles': [], 'jobarch': 'el8_amd64_gcc12', 'jobminuarch': 'x86-64-v3', 'jobsw': 'CMSSW_15_0_6_patch1', 'cacheurl': 'https://cmsweb.cern.ch/S3/crabcache_prod', 'cachefilename': 'b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz', 'debugfilename': 'bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz', 'runs': ['394153', '394154', '394169', '394175', '394183', '394184', '394185', '394186', '394187', '394188', '394189', '394204', '394209', '394217'], 'lumis': ['40,169', '1,886', '39,997', '47,988', '15,239', '1,667', '1,3', '1,15', '1,1', '1,107', '1,72', '38,932', '23,1209', '41,838']} 
+DEBUG 2025-09-25 19:47:01.214 UTC: 	 Encoded data for curl request: dryrun=0&workflow=crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16&saveoutput=1&savelogsflag=1&inputdata=%2FIonPhysics16%2Fbibehera-2pc_OO_V0_IP16-ca42279dfc2dce710b3991c24f27a617%2FUSER&nonvaliddata=0&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSReader&useparent=0&secondarydata=%2FIonPhysics16%2FOORun2025-PromptReco-v1%2FMINIAOD&ignorelocality=0&splitalgo=LumiBased&algoargs=3&totalunits=-1&lfn=%2Fstore%2Fuser%2Fbibehera%2F&publication=0&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&publishname2=2pc_OO_V0_IM_effcorr_cent0to60_IP16&jobtype=Analysis&generator=pythia&maxjobruntime=1250&numcores=1&maxmemory=2000&priority=10&nonprodsw=0&asyncdest=T3_CH_CERNBOX&requireaccelerator=0&oneEventMode=0&ignoreglobalblacklist=0&partialdataset=0&jobarch=el8_amd64_gcc12&jobminuarch=x86-64-v3&jobsw=CMSSW_15_0_6_patch1&cacheurl=https%3A%2F%2Fcmsweb.cern.ch%2FS3%2Fcrabcache_prod&cachefilename=b53588f34c59c94d562080ae16d45f446a7939917fc29026a3771735f7493144.tar.gz&debugfilename=bee440140400268e8957f558d347cbdc65cf0578f12e5371b08616527b4b0632.tar.gz&tfileoutfiles=V0_test_IM_wgt.root&runs=394153&runs=394154&runs=394169&runs=394175&runs=394183&runs=394184&runs=394185&runs=394186&runs=394187&runs=394188&runs=394189&runs=394204&runs=394209&runs=394217&lumis=40%2C169&lumis=1%2C886&lumis=39%2C997&lumis=47%2C988&lumis=15%2C239&lumis=1%2C667&lumis=1%2C3&lumis=1%2C15&lumis=1%2C1&lumis=1%2C107&lumis=1%2C72&lumis=38%2C932&lumis=23%2C1209&lumis=41%2C838
+DEBUG 2025-09-25 19:47:01.258 UTC: 	 Result: {'result': [{'RequestName': '250925_194701:bibehera_crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16'}]}
+INFO 2025-09-25 19:47:01.273 UTC: 	 Success: Your task has been delivered to the prod CRAB3 server.
+INFO 2025-09-25 19:47:01.274 UTC: 	 Task name: 250925_194701:bibehera_crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16
+INFO 2025-09-25 19:47:01.274 UTC: 	 Project dir: OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16
+INFO 2025-09-25 19:47:01.274 UTC: 	 Please use ' crab status -d OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16 ' to check how the submission process proceeds.
+DEBUG 2025-09-25 19:47:01.274 UTC: 	 About to return
+INFO 2025-09-25 19:47:01.291 UTC: 	 Log file is /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to60_IP16/crab.log

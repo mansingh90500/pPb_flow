@@ -1,0 +1,47 @@
+from CRABAPI.RawCommand import crabCommand
+from CRABClient.UserUtilities import config 
+from CRABClient.ClientExceptions import ClientException
+#from http.client import HTTPException
+
+config = config()
+
+###General: In this section, the user specifies generic parameters about the request (e.g. request name).
+config.General.workArea     = 'OO_Data_MINIAOD' ###fixed name for projects dir in my area
+config.General.transferLogs = True 
+config.General.transferOutputs = True
+config.JobType.pluginName     = 'Analysis'
+#config.JobType.psetName       = '../cfg/OO_2025_vn_2subf_diff_cfg.py' 
+config.JobType.psetName       = 'PbPb_2018_cfg.py'
+#config.JobType.psetName       = '../OO_2025_vn_2subf_diff_cfg.py'
+config.Data.unitsPerJob       = 3
+config.Data.totalUnits        = -1
+#config.JobType.maxMemoryMB = 4000
+config.Data.splitting         = 'LumiBased'
+#config.JobType.inputFiles = ['CentralityTable_HFtowers200_DataPbPb_periHYDJETshape_run3v1302x04_offline_374289.db']
+#config.Data.inputDBS          = 'global'
+config.Data.inputDBS          = 'phys03'
+config.Data.publication = False
+#config.Data.useParent = True
+#config.Data.outLFNDirBase            = '/store/user/bibehera'
+#config.Site.storageSite       = 'T2_US_Vanderbilt'
+config.Data.outLFNDirBase = '/store/user/bibehera/'
+config.Site.storageSite       = 'T3_CH_CERNBOX' 
+ 
+#config.Site.storageSite       = 'T3_CH_CERNBOX'
+        
+config.General.requestName  = '2pc_OO_V0_IM_effcorr_lowpT_cent0to50_IP59'
+config.Data.secondaryInputDataset = '/IonPhysics59/OORun2025-PromptReco-v1/MINIAOD'
+#config.Data.inputDataset = '/IonPhysics1/bibehera-2pc_OO_V0_IP1-6b0f3ea44d7735a15be74aa96b0380e8/USER'
+config.Data.inputDataset = '/IonPhysics59/bibehera-2pc_OO_V0_IP0-6b0f3ea44d7735a15be74aa96b0380e8/USER'
+#config.Data.inputDataset = '/IonPhysics0/bibehera-V0_OO_IP0_Run2025_MiniAOD-ca42279dfc2dce710b3991c24f27a617/USER'
+#config.Data.secondaryInputDataset = '/IonPhysics10/OORun2025-PromptReco-v1/MINIAOD'
+#config.Data.inputDataset = '/IonPhysics30/bibehera-2pc_OO_V0_IP30-ca42279dfc2dce710b3991c24f27a617/USER'
+config.Data.outputDatasetTag = '2pc_OO_V0_IM_effcorr_lowpT_cent0to50_IP59' ###change for each sample(task) --only if publish
+config.Data.lumiMask = 'generated_json.json'
+
+#try:
+ #   crabCommand('submit', config=config)
+#except HTTPException as hte:
+ #   print("Failed submitting task: {}".format(hte))
+#except ClientException as cle:
+ #   print("Failed submitting task: {}".format(cle))

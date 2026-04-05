@@ -1,0 +1,762 @@
+// This coe=de is fo cent bins 0-40% and 60%-80%
+
+#include <memory>
+
+// MSSW include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+//#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+
+#include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+
+#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+#include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
+
+#include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
+#include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
+
+// user include files
+#include "TH1F.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TTree.h"
+#include "TVector3.h"
+#include "TH1I.h"
+#include <Math/SMatrix.h>
+#include <Math/SVector.h>
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TString.h"
+#include "TObjString.h"
+#include "Analyzer/RaghuV0Ana/interface/DiHadronCorrelationEvt.h"
+
+typedef ROOT::Math::SMatrix<double, 3, 3, ROOT::Math::MatRepSym<double, 3> > SMatrixSym3D;
+typedef ROOT::Math::SVector<double, 3> SVector3;
+
+class RaghuV0Ana : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+   public:
+      explicit RaghuV0Ana(const edm::ParameterSet&);
+      ~RaghuV0Ana();
+
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+      //void   LoopV0Vertices(const edm::Event& iEvent, const edm::EventSetup& iSetup, bool istrg);
+      void   LoopV0Vertices(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+
+  // bool isMC_;      
+      int    GetpTbin(double V0pt, bool is_dcut);
+      void   AssignpTbins(double V0pt,  double V0eta,
+                          double V0phi, int V0id, double v0mass,
+                          double pdau_pt, double pdau_eta, double pdau_phi, double ndau_pt, double ndau_eta, 
+                          double ndau_phi,int idx, bool is_dcut);
+  //
+  void   AssignpTbins_ch(double V0pt,  double V0eta,
+			 double V0phi, int V0id, double v0mass, double ch_ntrk,
+                          double pdau_pt, double pdau_eta, double pdau_phi, double ndau_pt, double ndau_eta,
+                          double ndau_phi,int idx, bool is_dcut);
+  //
+  
+bool passSingleMuonAcc(double pt, double eta);
+  Double_t trkAcc(Double_t *x, Double_t *);
+      //double GetQinv(TLorentzVector q_trg, TLorentzVector q_ass);
+  // double deltaeta(const TVector3 a, const TVector3 b);
+  //   double deltaphi(const TVector3 a, const TVector3 b);
+      double deltaeta(double eta1,  double eta2);
+      double deltaphi(double phi1,  double phi2); 
+      int GetCentbin(float cent);
+
+      double GetQInv(double px1,double py1,double pz1,double E1,double px2,double py2,double pz2,double E2);
+      double GetQInvbais(double px11,double py11,double pz11,double E11,double px22,double py22,double pz22,double E22);
+
+      double GetQInv_daup(double px1_daup_ass,double py1_daup_ass,double pz1_daup_ass,double E1_daup_ass,double px1_daup_trg,double py1_daup_trg,double pz1_daup_trg,double E1_daup_trg);
+
+      double GetQInv_daun(double px1_daun_ass,double py1_daun_ass,double pz1_daun_ass,double E1_daun_ass,double px1_daun_trg,double py1_daun_trg,double pz1_daun_trg,double E1_daun_trg);
+
+      void FillHistsSignal_match(int ievt);
+      void FillHistsSignal_match_unmatch(int ievt);
+      void FillHistsSignal_unmatch(int ievt);
+      void FillHistsBackground(int ievt_trg, int jevt_ass);
+  void NormalizeHists();
+  Int_t getHiBinFromhiHF(const Double_t hiHF);
+
+
+   private:
+      virtual void beginJob() override;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+      virtual void endJob() override;
+ 
+      TVector3 trigger;
+      TVector3 associated;
+
+      edm::EDGetTokenT< edm::View < pat::PackedCandidate > > trackTags_;
+      edm::EDGetTokenT<pat::PackedCandidateCollection> packedCandToken_;
+      edm::EDGetTokenT<edm::Association<reco::TrackCollection>> pc2trackAssocToken_;
+      edm::EDGetTokenT<reco::TrackCollection> recoTracksToken_;
+      bool isMC_;
+      edm::EDGetTokenT<reco::GenParticleCollection> tracks_;
+
+  
+      // ## vertex ##
+      // used to select what vertex to read from configuration file
+  edm::EDGetTokenT<reco::VertexCollection> vtxTags_;
+  edm::EDGetTokenT<reco::VertexCompositeCandidateCollection> V0Src_;
+  //edm::EDGetTokenT<reco::VertexCompositeCandidateCollection> V0Src_jpsiSel_;
+  edm::EDGetTokenT<pat::CompositeCandidateCollection> V0Src_jpsiSel_;
+  edm::EDGetTokenT<int> dbCent_;
+  edm::EDGetTokenT<pat::CompositeCandidateCollection> V0Src_jpsi_;//new corrected 
+  //edm::EDGetTokenT<reco::VertexCompositeCandidateCollection> V0Src_jpsi_;
+  //edm::EDGetTokenT<int> dbCent_;
+
+      // ## calotower ##
+      // used to select what calo tower to read from configuration file
+      //edm::EDGetTokenT<CaloTowerCollection> caloTowersTags_;
+      edm::EDGetTokenT<CaloTowerCollection> caloTowerTags_;
+
+      // ## centrality ##
+      // used to select what centrality collection to read from configuration file
+      edm::EDGetTokenT<reco::Centrality> centralityTags_;
+
+      edm::EDGetTokenT<int> centralityBinTags_;
+      edm::Service<TFileService> fs;
+
+      //==================================================================================
+
+      // ## Vertex variables
+      int nVtx_;
+
+      std::vector<double> V0pt_vect;
+      std::vector<double> V0eta_vect;
+      std::vector<double> V0phi_vect;
+      std::vector<int> V0id_vect;
+      std::vector<double> V0mass_vect;
+
+      std::vector<double> pdau_pt_vect;
+      std::vector<double> pdau_eta_vect;
+      std::vector<double> pdau_phi_vect;
+      std::vector<double> pdau_chi2_vect;
+
+      std::vector<double> ndau_pt_vect;
+      std::vector<double> ndau_eta_vect;
+      std::vector<double> ndau_phi_vect;
+      std::vector<double> ndau_chi2_vect;
+
+      std::vector<double> V0pt_vect_unmatch;
+      std::vector<double> V0eta_vect_unmatch;
+      std::vector<double> V0phi_vect_unmatch;
+      std::vector<int> V0id_vect_unmatch;
+      std::vector<double> V0mass_vect_unmatch;
+
+      std::vector<double> pdau_pt_vect_unmatch;
+      std::vector<double> pdau_eta_vect_unmatch;
+      std::vector<double> pdau_phi_vect_unmatch;
+      std::vector<double> pdau_chi2_vect_unmatch;
+
+      std::vector<double> ndau_pt_vect_unmatch;
+      std::vector<double> ndau_eta_vect_unmatch;
+      std::vector<double> ndau_phi_vect_unmatch;
+      std::vector<double> ndau_chi2_vect_unmatch;
+
+  //  std::vector<reco::TrackBase::TrackQuality> qualities;   
+
+      //=====================================================================================
+      std::vector< double > pTmin_trg_; //min pt of the trigger tracks
+      std::vector< double > pTmax_trg_; //max pt of the trigger tracks
+      std::vector< double > pTmin_ass_; //min pt of the associated tracks
+      std::vector< double > pTmax_ass_; //max pt of the associated tracks
+
+  double pTmin_trg_jpsiSel_;
+  double pTmax_trg_jpsiSel_;
+  double pTmin_ass_jpsiSel_;
+  double pTmax_ass_jpsiSel_;
+
+  double pTmin_trg_jpsi_;
+  double pTmax_trg_jpsi_;
+  double pTmin_ass_jpsi_;
+  double pTmax_ass_jpsi_;
+
+  double  pTmin_trg_ks_;
+  double  pTmax_trg_ks_;
+  double  pTmin_ass_ks_;
+  double  pTmax_ass_ks_;  
+
+      unsigned int bkgFactor;
+      double zminVtx_; //min value for Z cut on vtx position
+      double zmaxVtx_; //max value for Z cut on vtx position
+      //bool selectVtxByMult_;       //False: sel best vtx by sum pT^2 True: sel best vtx with highest multiplicity
+      double rhomaxVtx_; //max value for XY cut on vtx position
+      int centmin_;
+      int centmax_;
+      int mult;
+      SVector3 pd1vector;
+      SVector3 pd2vector;
+      double xBestVtx_; //Best vertex X position
+      double yBestVtx_; //Best vertex Y position
+      double zBestVtx1_; //Best vertex Z position
+      int centbin;
+      double zBestVtx_; //Best vertex Z position
+      double rhoBestVtx1; //Best vertex XY position
+      //V0 vertex variabe
+      double dauEtamin_;
+      double dauEtamax_;
+      int dauNhitsmin_;
+      double dauNhitsmax_;
+      double dauPtmin_;
+      double dauPtmax_;
+      double dauPterrormin_;
+      double dauPterrormax_;
+      double dauPhimin_;
+      double dauPhimax_;
+      double dauDCASig_;
+      double mis_ks_range_;
+      double mis_la_range_;
+      double mis_jpsi_range_;
+      double mis_ph_range_;
+      int dauPixelhitsmin_;
+      double pxmin_;
+      double pxmax_;
+      double pymin_;
+      double pymax_;
+      double pzmin_;
+      double pzmax_;
+      double pTmin_;
+      double pTmax_;
+      double pTmin_ch_;
+      double pTmax_ch_;
+      double Etamin_;
+      double Etamax_;
+  double Etamin_j;
+      double Etamax_j;
+      double Rapmin_;
+      double Rapmax_;
+  double Rapmin_1;
+      double Rapmax_1;
+      double mSigLow_;
+      double mSigHigh_;
+      double mSB1Low_;
+      double mSB1High_;
+      double mSB2Low_;
+      double mSB2High_;
+  double Massmin_;
+      double Massmax_;
+      double Massmin_jpsiSel_;
+      double Massmax_jpsiSel_;
+      double Massmin_jpsi_;
+      double Massmax_jpsi_;
+  //double mSigLow_;
+  //double mSigHigh_;
+  //double mSB1Low_;
+  //double mSB1High_;
+  //double mSB2Low_;
+  //double mSB2High_;
+      double Chi2min_;
+      double Chi2max_;
+      double Ndfmin_;
+      double Ndfmax_;
+      double Chi2oNdfmin_;
+      double Chi2oNdfmax_;
+      double Lxymin_;
+      double Lxymax_;
+      double Lxyzmin_;
+      double Lxyzmax_;
+      double ThetaXYmin_;
+      double ThetaXYmax_;
+      double ThetaXYZmin_;
+      double ThetaXYZmax_;
+      double DecaySigXYmin_;
+      double DecaySigXYmax_;
+      double DecaySigXYZmin_;
+      double DecaySigXYZmax_;
+      double VtxProbmin_;
+      double VtxProbmax_;
+      double DCAmin_;
+      double DCAmax_;
+      double Anglemin_;
+      double Anglemax_;
+      double dau_costheta_;
+      double dau_delpt_;
+      double dau_etaphi_;
+      edm::InputTag mvaXML_;//new
+      double mvaCut_;
+      double del_R_;
+      double V0name;      
+      int total_antijpsi;
+      int total_jpsi;      
+      double  etHFtowerSum;
+      int bin1;
+      //V0
+      //double dca;
+      // double zvtx;
+      int count;
+      double alpha;
+      double qt;
+      double v0masspipi;
+      double v0massmumu;
+      double v0massee;
+      // ## track selection ##
+      int    nTrkTot_trg_;
+      float  nTrkTot_corr_trg_;
+      int    nTrkTot_ass_;
+      float  nTrkTot_corr_ass_;
+      std::vector<int>    nTrk_trg_;
+      std::vector<double> nTrk_corr_trg_;
+      std::vector<int>    nTrk_ass_;
+      std::vector<double> nTrk_corr_ass_;
+      double dzdzerror_; //DCA - z  significance
+      double d0dz0rror_; //DCA - xy significance
+      double pTerrorpT_; //DCA - pT resolution
+
+      double etamin_trg_; //min eta of the trigger tracks
+      double etamax_trg_; //max eta of the trigger tracks
+      double etamin_ass_; //min eta of the associated tracks
+      double etamax_ass_; //max eta of the associated tracks
+      bool isHI_; //Specific set of cuts PbPb data
+      bool isPix_;//Specific set of cuts for pixel tracks in PbPb data
+      double pTmax_pix_; //maximum pT to be a pixel track
+      int nhitsmin_pix_; //min number of hits to be a pix trk
+      int nhitsmax_pix_; //max number of hits to be a pix trk
+      double chi2nmax_pix_;  //maximum chi2n/nlayer to be a pixel track
+      double dzdzerror_pix_; //maximum DCA - z significance to be a pixel track
+      int nhitsmin_; //min number of hits for general tracks
+      std::vector<int> algo_; //algo for general tracks
+      double chi2nmax_; //maximum chi2 for general track
+
+  
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      //Kshort
+      Float_t V0id;
+      Float_t V0mass;
+      Float_t V0pt;
+      Float_t V0phi;
+      Float_t V0eta;
+      Float_t V0rapidity;
+      Float_t V0lxy;
+      Float_t V0lxyz;
+      Float_t V0Chi2;
+      Float_t V0Ndf;
+      Float_t V0chi2oNDF;
+      Float_t V0VtxProb;
+      Float_t V0cosThetaXY;
+      Float_t V0cosThetaXYZ;
+      Float_t V0distMagXY;
+      Float_t V0sigmaDistMagXY;
+      Float_t V0vtxDecaySigXY;
+      Float_t V0distMagXYZ;
+      Float_t V0sigmaDistMagXYZ;
+      Float_t V0vtxDecaySigXYZ ;
+      Float_t angle;
+      Float_t dca;
+      Float_t pdau_chi2;
+      Float_t pdau_ndf;
+      Float_t pdau_pt;
+      Float_t pdau_mass;
+      Float_t pdau_eta;
+      Float_t pdau_phi;
+      Float_t ndau_chi2;
+      Float_t ndau_ndf;
+      Float_t ndau_pt;
+      Float_t ndau_mass;
+      Float_t ndau_eta;
+      Float_t ndau_phi;
+      int pTrkNHit;
+      Float_t pTrkPtError;
+      Float_t pTrkNPxLayer;
+      Float_t pTrkDCASigXY;
+      Float_t pTrkDCASigZ;
+      int nTrkNHit;
+      Float_t nTrkPtError;
+      Float_t nTrkNPxLayer;
+      Float_t nTrkDCASigXY;
+      Float_t nTrkDCASigZ;
+
+  
+      //jpsi selected candidate
+      Float_t V0id_jpsiSel;
+      Float_t V0mass_jpsiSel;
+      Float_t V0pt_jpsiSel;
+      Float_t V0phi_jpsiSel;
+      Float_t V0eta_jpsiSel;
+      Float_t V0rapidity_jpsiSel;
+      Float_t V0lxy_jpsiSel;
+      Float_t V0lxyz_jpsiSel;
+      Float_t V0Chi2_jpsiSel;
+      Float_t V0Ndf_jpsiSel;
+      Float_t V0chi2oNDF_jpsiSel;
+      Float_t V0VtxProb_jpsiSel;
+      Float_t V0cosThetaXY_jpsiSel;
+      Float_t V0cosThetaXYZ_jpsiSel;
+      Float_t V0distMagXY_jpsiSel;
+      Float_t V0sigmaDistMagXY_jpsiSel;
+      Float_t V0vtxDecaySigXY_jpsiSel;
+      Float_t V0distMagXYZ_jpsiSel;
+      Float_t angle_jpsiSel;
+      Float_t dca_jpsiSel;
+      Float_t pdau_chi2_jpsiSel;
+      Float_t pdau_ndf_jpsiSel;
+      Float_t pdau_pt_jpsiSel;
+      Float_t pdau_mass_jpsiSel;
+      Float_t pdau_eta_jpsiSel;
+      Float_t pdau_phi_jpsiSel;
+      Float_t ndau_chi2_jpsiSel;
+      Float_t ndau_ndf_jpsiSel;
+      Float_t ndau_pt_jpsiSel;
+      Float_t ndau_mass_jpsiSel;
+      Float_t ndau_eta_jpsiSel;
+      Float_t ndau_phi_jpsiSel;
+      Float_t pTrkNHit_jpsiSel;
+      Float_t pTrkPtError_jpsiSel;
+      Float_t pTrkNPxLayer_jpsiSel;
+      Float_t pTrkDCASigXY_jpsiSel;
+      Float_t pTrkDCASigZ_jpsiSel;
+      Float_t nTrkNHit_jpsiSel;
+      Float_t nTrkPtError_jpsiSel;
+      Float_t nTrkNPxLayer_jpsiSel;
+      Float_t nTrkDCASigXY_jpsiSel;
+      Float_t nTrkDCASigZ_jpsiSel;
+
+      
+    
+      Float_t cent;
+      TMVA::Reader *reader;
+      char Lambda;
+      char Kshort;
+      char jpsi;
+
+      
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //Jpsi
+      Float_t V0id_jpsi;
+      Float_t V0mass_jpsi;
+      Float_t V0pt_jpsi;
+      Float_t V0phi_jpsi;
+      Float_t V0eta_jpsi;
+      Float_t V0rapidity_jpsi;
+      Float_t V0lxy_jpsi;
+      Float_t V0lxyz_jpsi;
+      Float_t V0Chi2_jpsi;
+      Float_t V0Ndf_jpsi;
+      Float_t V0chi2oNDF_jpsi;
+      Float_t V0VtxProb_jpsi;
+      Float_t V0cosThetaXY_jpsi;
+      Float_t V0cosThetaXYZ_jpsi;
+      Float_t V0distMagXY_jpsi;
+      Float_t V0sigmaDistMagXY_jpsi;
+      Float_t V0vtxDecaySigXY_jpsi;
+      Float_t V0distMagXYZ_jpsi;
+      Float_t V0sigmaDistMagXYZ_jpsi;
+      Float_t V0vtxDecaySigXYZ_jpsi;
+      Float_t angle_jpsi;
+      Float_t dca_jpsi;
+      Float_t pdau_chi2_jpsi;
+      Float_t pdau_ndf_jpsi;
+      Float_t pdau_pt_jpsi;
+      Float_t pdau_mass_jpsi;
+      Float_t pdau_eta_jpsi;
+      Float_t pdau_phi_jpsi;
+      Float_t ndau_chi2_jpsi;
+      Float_t ndau_ndf_jpsi;
+      Float_t ndau_pt_jpsi;
+      Float_t ndau_mass_jpsi;
+      Float_t ndau_eta_jpsi;
+      Float_t ndau_phi_jpsi;
+      Float_t pTrkNHit_jpsi;
+      Float_t pTrkPtError_jpsi;
+      Float_t pTrkNPxLayer_jpsi;
+      Float_t pTrkDCASigXY_jpsi;
+      Float_t pTrkDCASigZ_jpsi;
+      Float_t nTrkNHit_jpsi;
+      Float_t nTrkPtError_jpsi;
+      Float_t nTrkNPxLayer_jpsi;
+      Float_t nTrkDCASigXY_jpsi;
+      Float_t nTrkDCASigZ_jpsi;
+
+
+
+
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+  // ## Dihardon corr events ##
+      DiHadronCorrelationEvt* evt_;
+      std::vector< DiHadronCorrelationEvt > evtVec_;
+      
+
+
+
+      // ## histograms ##
+      //~~~> Vertex
+      TH1F* hXBestVtx_;
+      TH1F* hYBestVtx_;
+      TH1F* hRhoBestVtx_;
+      TH1F* hZBestVtx_;
+      TH1I* hNVtx_;
+
+      TH1F* hPhidist_;
+      TH1D* hEtadist_;
+      TH1D* hPTdist_;
+      //double v0masspiproton1;
+      //double v0masspiproton2;
+      //~~~> Global
+      TH1I* hCent_;
+      TH1I* hNoff_;
+      TH1I* hMult_trg_;
+      TH1F* hMult_corr_trg_;
+      TH1I* hMult_ass_;
+      TH1F* hMult_corr_ass_;
+      TH1F* hcent_bin ;
+      TH1I* hcounts_; //claude
+      TH1I* hNtrigs_; //claude
+      TH1D* hV0pT_;
+      TH1D* hpT_jpsi_;
+      TH1D* hV0pT_jpsiSel_;
+      TH1D* hV0pT_jpsi_;
+      TH1F* hchi2_;
+      TH1F* hchi2_jpsiSel_;
+      TH1F* hchi2_jpsi_;
+      TH1D* hV0pT_before_;
+      TH1D* hV0pT_before_jpsiSel_;
+      TH1D* hV0pT_before_jpsi_;
+      TH1D* hV0mass_wocut_;
+      TH1D* hmass_jpsi_;
+      TH1D* hmass_jpsi1_;
+      TH1D* hV0mass_wocut_jpsiSel_;
+      TH1D* hV0mass_wocut_jpsi_;
+      TH1D* hV0mass_jpsi_;
+      TH1D* hV0mass_match_;
+      TH1D* hV0mass_unmatch_;
+      TH1D* hV0mass_wcut_;
+      TH1D* hV0mass_pipi_;
+      TH1D* hV0mass_mumu_;
+      TH1D* hV0mass_ee_;
+      TH1D* hV0mass_p1_;
+      TH1D* hV0mass_p2_;
+      TH1D* hV0mass_sig_after_match;
+      TH1D* hV0mass_sig_before_match;
+      TH1D* hV0mass_sig_after_match_unmatch;
+      TH1D* hV0mass_sig_before_match_unmatch;
+      TH1D* hV0mass_sig_after_unmatch;
+      TH1D* hV0mass_sig_before_unmatch;
+      TH1D* hV0mass_sig_ABB;
+      TH1D* hV0mass_sig_ABB_before;
+      TH1D* hV0mass_sig_BB;
+      TH1D* hV0mass_sig_BB_before;
+      TH1D* hV0mass_sig_bais_match;
+      TH1D* hV0mass_sig_bais_match_unmatch;
+      TH1D* hV0mass_sig_bais_unmatch;
+      TH1D* hdaup_sig_after;
+      TH1D* hdaun_sig_after;
+      TH1D* hdaup_sig_before;
+      TH1D* hdaun_sig_before;
+      TH1D* hV0mass_back_bais;
+      TH1D* hV0mass_back_before;
+      TH1D* hV0mass_back_after;
+      TH1D* hV0mass_back_ABB;
+      TH1D* hV0mass_back_BB;
+      TH1D* hSignal_trg_mass;
+      TH1D* hSignal_ass_mass;
+      TH1D* hBackground_trg_mass;
+      TH1D* hBackground_ass_mass;
+      TH1D* hV0eta_;
+      TH1D* heta_jpsi_;
+      TH1D* hV0eta_jpsiSel_;
+      TH1D* hV0eta_jpsi_;
+      TH1D* hV0rapidity_;
+      TH1D* hrapidity_jpsi_;
+      TH1D* hvtxProv_jpsi_;
+      TH1D* hvtxProv_jpsiSel_;
+      TH1D* hV0rapidity_jpsiSel_;
+  TH2D* hpT_eta_;
+  TH2D* hpT_eta_mu;
+  TH2D* hpT_eta_mupl;
+  TH2D* hpT_eta_mumi;
+  TH2D* hpT_rap_;
+  TH2D* hpT_eta1_;
+  TH2D* hpT_rap1_;
+  TH1D* hch_eta_;
+  TH1D* hch_pt_;
+  TH1D* hch_phi_;
+  TH2D* hch_pt_eta_;
+
+      TH1D* hV0phi_;
+      TH1D* hphi_jpsi_;
+      TH1D* hV0phi_jpsiSel_;
+      TH1D* hV0phi_jpsi_;
+      TH1D* hV0costheta_;
+      TH1D* hCentrality_;
+      TH1D* hhf_;
+      TH1D* hV03d_;
+      TH1I* hbin_;
+      TH1I* hbin1_;
+      TH1I* hcount_;
+      TH1D* hzvtx_;
+      TH1D* hmult_;
+      TH1I* hv0;
+      TH2D* harmen_wcut_;
+      TH2D* harmen_wocut_;
+      TH2D* harmen_wcut_jpsiSel_;
+      TH2D* harmen_wocut_jpsiSel_;
+      TH2D* harmen_wcut_jpsi_;
+      TH2D* harmen_wocut_jpsi_;
+      TH2D* hnet_jpsi_deleta_;
+      TH1D* hnet_jpsi_;
+      TH1D* hdaup_costheta;
+      TH1D* hdaun_costheta;
+      TH1D* hdaup_delpt;
+      TH1D* hdaun_delpt;
+      TH1D* hdaup_deleta;
+      TH1D* hdaun_deleta;
+      TH1D* hdaup_delphi;
+      TH1D* hdaun_delphi;
+      TH1D* hdaup_delchi2_beforedau;
+      TH1D* hdaun_delchi2_beforedau;
+      TH1D* hdaup_delchi2_afterdau;
+      TH1D* hdaun_delchi2_afterdau;
+      TH1D* hdaup_delchi2_reco_beforedau;
+      TH1D* hdaun_delchi2_reco_beforedau;
+      TH1D* hdaup_delchi2_reco_afterdau;
+      TH1D* hdaun_delchi2_reco_afterdau;
+  
+      TH1D* hdelR_;
+      TH1D* hdelpt_;
+
+      TH1D* hntrg_addbincontent_endjob;
+      TH1D* hntrg_addbincontent_endjob_bkg;
+      TH1D* hpt_trigg_jpsiSel_endjob;
+      TH1D* hpt_trigg_jpsi_endjob;
+      TH1D* hpt_trigg_ks_endjob;
+      TH2D* hsignal_c2_jpsiSel_vs_ch;
+      TH2D* hsignal_c2_jpsi_vs_ch;
+      TH2D* hsignal_c2_ks_vs_ch;
+      TH2D* hmixing_c2_jpsiSel_vs_ch;
+      TH2D* hmixing_c2_jpsi_vs_ch;
+      TH2D* hmixing_c2_ks_vs_ch;
+
+  //pT distribution
+  TH1D* hV0pTbin;
+      std::vector<TH1D*> hpTmass_check;
+      std::vector<double> sigma2_jpsi_minMass;
+      std::vector<double> sigma2_jpsi_maxMass;
+      std::vector<double> sigma2_kshort_minMass;
+      std::vector<double> sigma2_kshort_maxMass;
+      std::vector<double> sigma3_jpsi_minMass;
+      std::vector<double> sigma3_jpsi_maxMass;
+      std::vector<double> sigma3_kshort_minMass;
+      std::vector<double> sigma3_kshort_maxMass;
+  
+  //std::vector<std::vector<std::vector<TH1D*>>> hntrg_obs_jpsiks;
+  //std::vector<std::vector<std::vector<TH1D*>>> hntrg_bkg_jpsiks;
+  //std::vector<std::vector<std::vector<TH1D*>>> hntrg_obs_jpsiks;
+  //std::vector<std::vector<std::vector<TH1D*>>> hntrg_bkg_jpsiks;
+
+  //std::vector<std::vector<std::vector<TH1D*>>> hntrg_obs_lm;
+  std::vector<std::vector<TH1D*>> hntrg_obs_jpsiSel;
+  //std::vector<std::vector<TH1D*>> hntrg_bkg_jpsiSel;
+  std::vector<std::vector<TH1D*>> hntrg_obs_jpsiks;
+  //std::vector<std::vector<TH1D*>> hntrg_bkg_jpsiks;
+  
+  //std::vector<std::vector<std::vector<TH2D*>>> hobs_sig_c2_jpsi_vs_ch;
+  //std::vector<std::vector<std::vector<TH2D*>>> hobs_mix_c2_jpsi_vs_ch;
+    std::vector<std::vector<TH2D*>> hobs_sig_c2_jpsi_vs_ch;
+    std::vector<std::vector<TH2D*>> hobs_mix_c2_jpsi_vs_ch;
+
+    std::vector<std::vector<TH2D*>> hobs_sig_c2_jpsiSel_vs_ch;
+    std::vector<std::vector<TH2D*>> hobs_mix_c2_jpsiSel_vs_ch;
+  
+    std::vector<std::vector<TH2D*>> hbkg_sig_c2_jpsi_vs_ch;
+    std::vector<std::vector<TH2D*>> hbkg_mix_c2_jpsi_vs_ch;
+  
+  //std::vector<std::vector<TH2D*>>
+  //std::vector<std::vector<std::vector<TH2D*>>> hobs_sig_c2_jpsiSel_vs_ch;
+  //std::vector<std::vector<std::vector<TH2D*>>> hbkg_mix_c2_jpsiSel_vs_ch;
+      std::vector<std::vector<TH2D*>> hobs_sig_c2_ks_vs_ch;
+  //std::vector<std::vector<TH2D*>> hobs_mix_c2_jpsiSel_vs_ch;
+      std::vector<std::vector<TH2D*>> hobs_mix_c2_ks_vs_ch;
+
+      std::vector<std::vector<TH2D*>> hbkg_sig_c2_jpsiSel_vs_ch;
+      std::vector<std::vector<TH2D*>> hbkg_sig_c2_ks_vs_ch;
+      std::vector<std::vector<TH2D*>> hbkg_mix_c2_jpsiSel_vs_ch;
+      std::vector<std::vector<TH2D*>> hbkg_mix_c2_ks_vs_ch;
+  //std::vector<double> npt_binedge;
+  //unsigned int nptbins;
+  std::vector<TH1D*> jpsi_pT;
+  //std::vector<std::vector<TH1D*>> jpsi_pT;
+      std::vector<TH1D*> kshort_pT;
+      std::vector<TH1D*> hntrg_sig;
+      std::vector<TH1D*> hntrg_bkg;
+      std::vector<TH2D*> hsig_c2_jpsiSel_vs_ch;
+      std::vector<TH2D*> hsig_c2_jpsi_vs_ch;
+      std::vector<TH2D*> hsig_c2_ks_vs_ch;
+      std::vector<TH2D*> hmix_c2_jpsiSel_vs_ch;
+      std::vector<TH2D*> hmix_c2_jpsi_vs_ch;
+      std::vector<TH2D*> hmix_c2_ks_vs_ch;
+  
+      //~~~> Trigger tracks RAW
+
+      std::vector<TH1D*> hV0mass1_trg_;
+      std::vector<TH1D*> hV0mass2_ass_;
+      std::vector<TH1F*> hPtTrk_trg_;
+      std::vector<TH1F*> hPhiTrk_trg_;
+      std::vector<TH1I*> hMultTrk_trg_;
+      //~~~> Trigger tracks CORR
+      std::vector<TH1F*> hEtaTrk_corr_trg_;
+      std::vector<TH1F*> hPtTrk_corr_trg_;
+      std::vector<TH1F*> hPhiTrk_corr_trg_;
+      std::vector<TH1F*> hMultTrk_corr_trg_;
+      //~~~> Associated tracks RAW
+      std::vector<TH1F*> hEtaTrk_ass_;
+      std::vector<TH1F*> hPtTrk_ass_;
+      std::vector<TH1F*> hPhiTrk_ass_;
+      std::vector<TH1I*> hMultTrk_ass_;
+      //~~~> Associated tracks CORR
+      std::vector<TH1F*> hEtaTrk_corr_ass_;
+      std::vector<TH1F*> hPtTrk_corr_ass_;
+      std::vector<TH1F*> hPhiTrk_corr_ass_;
+      std::vector<TH1F*> hMultTrk_corr_ass_;
+
+  int ntrkoff;
+  TH1D * hV0centbin;
+  TH1D * hV0massbin_jpsi;
+  TH1D * hV0massbin_jpsiSel;
+  TH2D * hsig_c2_ch_vs_ch;
+  TH2D * hmix_c2_ch_vs_ch;
+  TH1D * hntrg_ch;
+  TH1D * hntrg_ch_assoc;
+  TH1D * hevent_V0_CH;
+  //TH1D * hevent_V0_CH_new;
+  //std::vector< double > binTable;
+  //const Int_t ncBins = 200;
+
+  //std::vector<TH2D*> hsig_c2_ch_vs_ch;
+  //std::vector<TH2D*> hmix_c2_ch_vs_ch;
+  //std::vector<TH1D*> hntrg_ch;
+  //std::vector<TH1D*> hntrg_ch_assoc;
+  //std::vector<TH1D*> hevent_V0_CH;
+  std::vector< double > binTable;
+  const Int_t ncBins = 200;
+  
+  std::vector<double> npt_binedge;
+  unsigned int nptbins;
+  std::vector<double> ncentbin_binedge;
+  unsigned int ncentbins;
+  std::vector<double> nmass_jpsi_binedge;
+  unsigned int nmassbins_jpsi;
+    std::vector<double> nmass_jpsiSel_binedge;
+  unsigned int nmassbins_jpsiSel;
+};

@@ -1,0 +1,1314 @@
+// -*- C++ -*-
+//
+// Package:    Analyzers/RaghuV0Ana
+// Class:      RaghuV0Ana
+//
+/**\class RaghuV0Ana RaghuV0Ana.cc Analyzers/RaghuV0Ana/plugins/RaghuV0Ana.cc
+ Description: [one line class summary]
+ Implementation:
+     [Notes on implementation]
+*/
+//
+//          Author: Raghunath  
+
+
+// CMSSW include files
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+// user include files
+#include "Analyzers/RaghuV0Ana/interface/RaghuV0Ana.h"
+
+// constructors and destructor
+//
+RaghuV0Ana::RaghuV0Ana(const edm::ParameterSet& iConfig) :
+  //tracks
+  trackTags_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracksSrc"))),
+  tracks_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("tracks"))),
+  //vertex
+  vtxTags_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
+  //V0
+  V0Src_(consumes<reco::VertexCompositeCandidateCollection>(iConfig.getParameter<edm::InputTag>("V0Src"))),
+  dbCent_(consumes<int>(iConfig.getUntrackedParameter<edm::InputTag>("dbCent"))),  
+
+  //=========================================================================================================
+  pTmin_trg_(iConfig.getUntrackedParameter< std::vector< double > >("pTminTrk_trg")),
+  pTmax_trg_(iConfig.getUntrackedParameter< std::vector< double > >("pTmaxTrk_trg")),
+  pTmin_ass_(iConfig.getUntrackedParameter< std::vector< double > >("pTminTrk_ass")),
+  pTmax_ass_(iConfig.getUntrackedParameter< std::vector< double > >("pTmaxTrk_ass")),
+  bkgFactor_(iConfig.getUntrackedParameter<unsigned int>("bkgFactor")),
+  zminVtx_(iConfig.getUntrackedParameter<double>("zminVtx")),
+  zmaxVtx_(iConfig.getUntrackedParameter<double>("zmaxVtx")),
+  //==========================================================================================================
+  mis_ks_range_(iConfig.getUntrackedParameter<double>("mis_ks_range")),
+//mis_la_range_(iConfig.getUntrackedParameter<double>("mis_la_range")), 
+ mis_ph_range_(iConfig.getUntrackedParameter<double>("mis_ph_range")),
+  
+  pTmin_(iConfig.getUntrackedParameter<double>("ptMin")),
+  pTmax_(iConfig.getUntrackedParameter<double>("ptMax")),
+  Etamin_(iConfig.getUntrackedParameter<double>("EtaMin")),
+  Etamax_(iConfig.getUntrackedParameter<double>("EtaMax")),
+  Rapmin_(iConfig.getUntrackedParameter<double>("RapMin")),
+  Rapmax_(iConfig.getUntrackedParameter<double>("RapMax")),
+  Massmin_(iConfig.getUntrackedParameter<double>("MassMin")),
+  Massmax_(iConfig.getUntrackedParameter<double>("MassMax")),
+  //ThetaXYZmin_(iConfig.getUntrackedParameter<double>("ThetaXYZMin")),
+  //ThetaXYZmax_(iConfig.getUntrackedParameter<double>("ThetaXYZMax",999.)),
+  //DecaySigXYZmin_(iConfig.getUntrackedParameter<double>("DecayXYZMin")),
+  //DecaySigXYZmax_(iConfig.getUntrackedParameter<double>("DecayXYZMax",9999999.)),
+
+  //dau_costheta_(iConfig.getUntrackedParameter<double>("dau_costheta")),
+  //dau_delpt_(iConfig.getUntrackedParameter<double>("dau_delpt")),
+
+  dau_etaphi_(iConfig.getUntrackedParameter<double>("dau_etaphi")),
+  mvaXML_(iConfig.getUntrackedParameter<edm::InputTag>("mvaXML")),//new
+  mvaCut_(iConfig.getUntrackedParameter<double>("mvaCut")),
+  del_R_(iConfig.getUntrackedParameter<double>("del_R"))
+{
+
+  evt_ = new DiHadronCorrelationEvt(pTmin_trg_.size(), pTmin_ass_.size());  
+  usesResource("TFileService");
+  TH1::SetDefaultSumw2();
+  
+  // Now do what ever initialization is needed
+  
+  edm::Service<TFileService> fs;
+
+  // Histograms
+  TFileDirectory fGlobalHist  = fs->mkdir("QA_plots");
+  hV0pT_          = fGlobalHist.make<TH1D>("hV0pT", "", 85 , 0.0, 8.5);
+  hV0pT_before_          = fGlobalHist.make<TH1D>("hV0pT_before", "", 85 , 0.0, 8.5);
+  hzvtx_          = fGlobalHist.make<TH1D>("hzvtx", "", 400 , -20, 20);
+  hV0eta_          = fGlobalHist.make<TH1D>("hV0eta", "", 60 , -2.4, 2.4);
+  hV0phi_          = fGlobalHist.make<TH1D>("hV0phi", "", 60 , -TMath::Pi(),  TMath::Pi());
+  hbin_            = fGlobalHist.make<TH1I>("hbin", "", 200 , 0, 200);
+  hcent_bin        = fGlobalHist.make<TH1F>("hcent_bin distribution", "", 16, 0, 80);
+  TFileDirectory fV0Hist  = fs->mkdir("V0_plots");
+
+  hV0mass_sig_before_match          = fV0Hist.make<TH1D>("hV0mass_sig_before_match", "", 500 , 0, 10) ;
+  hV0mass_sig_after_match          = fV0Hist.make<TH1D>("hV0mass_sig_after_match", "", 500 , 0, 10) ;
+
+  hV0mass_sig_before_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_before_match_unmatch", "", 500 , 0, 10) ;
+  hV0mass_sig_after_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_after_match_unmatch", "", 500 , 0, 10) ;
+
+  hV0mass_sig_before_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_before_unmatch", "", 500 , 0, 10) ;
+  hV0mass_sig_after_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_after_unmatch", "", 500 , 0, 10) ;
+
+  //hV0mass_sig_ABB          = fV0Hist.make<TH1D>("hV0mass_sig_ABB", "", 250 , 0, 10) ;
+  //hV0mass_sig_ABB_before          = fV0Hist.make<TH1D>("hV0mass_sig_ABB_before", "", 250 , 0, 10) ;
+  //hV0mass_sig_BB          = fV0Hist.make<TH1D>("hV0mass_sig_BB", "", 250 , 0, 10) ;
+  //hV0mass_sig_BB_before          = fV0Hist.make<TH1D>("hV0mass_sig_BB_before", "", 250 , 0, 10) ;
+
+  hV0mass_back_before          = fV0Hist.make<TH1D>("hV0mass_back_before","",250 ,0, 10) ;
+  hV0mass_back_after          = fV0Hist.make<TH1D>("hV0mass_back_after","",250 ,0, 10) ;
+
+  /*hV0mass_back_before_match          = fV0Hist.make<TH1D>("hV0mass_back_before_match","",250 ,0, 10) ;
+  hV0mass_back_after_match          = fV0Hist.make<TH1D>("hV0mass_back_after_match","",250 ,0, 10) ;
+
+  hV0mass_back_before_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_before_match_unmatch","",250 ,0, 10) ;
+  hV0mass_back_after_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_after_match_unmatch","",250 ,0, 10) ;
+
+  hV0mass_back_before_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_before_unmatch","",250 ,0, 10) ;
+  hV0mass_back_after_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_after_unmatch","",250 ,0, 10) ;
+  */
+  //hV0mass_back_ABB          = fV0Hist.make<TH1D>("hV0mass_back_ABB","",250 ,0, 10) ;
+  //hV0mass_back_BB          = fV0Hist.make<TH1D>("hV0mass_back_BBBB","",250 ,0, 10) ;
+
+
+  //hdaup_sig_after           = fV0Hist.make<TH1D>("hdaup_sig_after","",100 ,0, 2) ;
+  //hdaun_sig_after           = fV0Hist.make<TH1D>("hdaun_sig_after","",100 ,0, 2) ;
+
+  //hdaup_sig_before           = fV0Hist.make<TH1D>("hdaup_sig_before","",100 ,0, 2) ;
+  //hdaun_sig_before           = fV0Hist.make<TH1D>("hdaun_sig_before","",100 ,0, 2) ;
+  
+  hV0mass_sig_bais_match          = fV0Hist.make<TH1D>("hV0mass_sig_bais_match", "", 125 , 0, 1);
+  hV0mass_sig_bais_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_bais_match_unmatch", "", 125 , 0, 1);
+  hV0mass_sig_bais_unmatch          = fV0Hist.make<TH1D>("hV0mass_sig_bais_unmatch", "", 125 , 0, 1);
+
+  hV0mass_back_bais          = fV0Hist.make<TH1D>("hV0mass_back_bais", "", 125 , 0, 1);
+  /*hV0mass_back_bais_match          = fV0Hist.make<TH1D>("hV0mass_back_bais_match", "", 25 , 0, 1);
+  hV0mass_back_bais_match_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_bais_match_unmatch", "", 25 , 0, 1);
+  hV0mass_back_bais_unmatch          = fV0Hist.make<TH1D>("hV0mass_back_bais_unmatch", "", 25 , 0, 1);
+  */
+
+  hV0mass_wocut_          = fV0Hist.make<TH1D>("hV0mass1", "", 160 ,1.08, 1.16);
+  hV0mass_match_          = fV0Hist.make<TH1D>("hV0mass_match", "", 160 ,1.08, 1.16);
+  hV0mass_unmatch_          = fV0Hist.make<TH1D>("hV0mass_unmatch", "", 160 ,1.08, 1.16);
+
+  harmen_wcut_         = fV0Hist.make<TH2D>("harmen_wcut", "", 100 , -1.0,1.0,150,0,0.3 );
+  harmen_wocut_         = fV0Hist.make<TH2D>("harmen_wocut", "", 100 , -1.0,1.0,150,0,0.3 );
+    
+  hV0mass_pipi_          = fV0Hist.make<TH1D>("hV0mass_pipi", "", 130 , 0.43, 0.56);
+  hV0mass_ee_          = fV0Hist.make<TH1D>("hV0mass_ee", "", 200 , 0.0, 0.20);
+
+  hdaup_delchi2_beforedau = fV0Hist.make<TH1D>("hdaup_delchi2_beforedau","", 100,  0, 0.01);
+  hdaun_delchi2_beforedau = fV0Hist.make<TH1D>("hdaun_delchi2_beforedau","", 100,  0, 0.01);
+
+  hdaup_delchi2_afterdau = fV0Hist.make<TH1D>("hdaup_delchi2_afterdau","", 100,  0, 0.01);
+  hdaun_delchi2_afterdau = fV0Hist.make<TH1D>("hdaun_delchi2_afterdau","", 100,  0, 0.01);
+
+  hdaup_delchi2_reco_beforedau = fV0Hist.make<TH1D>("hdaup_delchi2_reco_beforedau","", 100,  0, 0.01);
+  hdaun_delchi2_reco_beforedau = fV0Hist.make<TH1D>("hdaun_delchi2_reco_beforedau","", 100,  0, 0.01);
+
+  hdaup_delchi2_reco_afterdau = fV0Hist.make<TH1D>("hdaup_delchi2_reco_afterdau","", 100,  0, 0.01);
+  hdaun_delchi2_reco_afterdau = fV0Hist.make<TH1D>("hdaun_delchi2_reco_afterdau","", 100,  0, 0.01);
+  //hdaup_costheta          = fV0Hist.make<TH1D>("hdaup_costheta", "", 100 , 0.990, 1.0);
+
+  //hdaup_costheta          = fV0Hist.make<TH1D>("hdaup_costheta", "", 100 , 0.990, 1.0);
+  //hdaun_costheta          = fV0Hist.make<TH1D>("hdaun_costheta", "", 100 , 0.990, 1.0);
+
+  //hdaun_delpt          = fV0Hist.make<TH1D>("hdaun_delpt", "", 100 , 0.0, 1.0);
+  //hdaup_delpt          = fV0Hist.make<TH1D>("hdaup_delpt", "", 100 , 0.0, 1.0);
+
+  //hdaun_deleta          = fV0Hist.make<TH1D>("hdaun_deleta", "", 480 , 0.0, 4.8);
+  //hdaup_deleta          = fV0Hist.make<TH1D>("hdaup_deleta", "", 480 , 0.0, 4.8);
+
+  //hdaun_delphi          = fV0Hist.make<TH1D>("hdaun_delphi", "", 628 , 0.0, 6.28);
+  //hdaup_delphi          = fV0Hist.make<TH1D>("hdaup_delphi", "", 628 , 0.0, 6.28);
+    
+  hdelR_          = fV0Hist.make<TH1D>("DelR", "", 500 , 0.0, 5.0);
+  hdelpt_          = fV0Hist.make<TH1D>("Delpt", "", 500 , 0.0, 5.0);
+
+  TFileDirectory fTrkCorrTrgHist  = fs->mkdir("Trgmass"); 
+  hV0mass1_trg_.resize(pTmin_trg_.size());
+  for(unsigned int ipt = 0; ipt < pTmin_trg_.size(); ++ipt)
+    {
+      hV0mass1_trg_[ipt] = fTrkCorrTrgHist.make<TH1D>(Form("hV0mass1_trg_%d",ipt),                                                                 
+						      Form("%1.1f<p_{T}<%1.1f GeV/c", pTmin_trg_[ipt], pTmax_trg_[ipt]),                            
+						      160 ,1.08, 1.16);  
+    }
+  TFileDirectory fTrkCorrAssHist  = fs->mkdir("AssTracksCorr");
+  hV0mass2_ass_.resize(pTmin_ass_.size());
+  for(unsigned int ipt = 0; ipt < pTmin_ass_.size(); ++ipt)
+    {
+      hV0mass2_ass_[ipt] = fTrkCorrAssHist.make<TH1D>(Form("hV0mass2_ass_%d",ipt),                                                                 
+						      Form("%1.1f<p_{T}<%1.1f GeV/c", pTmin_ass_[ipt], pTmax_ass_[ipt]),                         
+						      160 ,1.08, 1.16);
+    }
+ 
+  //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  TMVA::Tools::Instance();
+  reader = new TMVA::Reader( "!Color:!Silent" );
+  TString filename(mvaXML_.label().c_str()); //new
+  edm::FileInPath fip(Form("Analyzers/RaghuV0Ana/data/EFF/%s",filename.Data()));//new
+  reader->AddVariable( "pt",               &V0pt             );
+  reader->AddVariable( "rapidity",         &V0rapidity       );
+  reader->AddVariable( "vtxChi2",          &V0Chi2           );
+  reader->AddVariable( "cosThetaXYZ",      &V0cosThetaXYZ    );
+  reader->AddVariable( "Lxyz",             &V0lxyz           );
+  reader->AddVariable( "vtxDecaySigXYZ",   &V0vtxDecaySigXYZ );
+  reader->AddVariable( "DCA",              &dca              );
+  reader->AddVariable( "pTrkNHit",         &pTrkNHit         );
+  reader->AddVariable( "pTrkPt",           &pdau_pt          );
+  reader->AddVariable( "pTrkPtError",      &pTrkPtError      );
+  reader->AddVariable( "pTrkEta",          &pdau_eta         );
+  reader->AddVariable( "pTrkNPxLayer",     &pTrkNPxLayer     );
+  reader->AddVariable( "pTrkDCASigXY",     &pTrkDCASigXY     );
+  reader->AddVariable( "pTrkDCASigZ",      &pTrkDCASigZ      );
+  reader->AddVariable( "nTrkNHit",         &nTrkNHit         );
+  reader->AddVariable( "nTrkPt",           &ndau_pt          );
+  reader->AddVariable( "nTrkPtError",      &nTrkPtError      );
+  reader->AddVariable( "nTrkEta",          &ndau_eta         );
+  reader->AddVariable( "nTrkNPxLayer",     &nTrkNPxLayer     );
+  reader->AddVariable( "nTrkDCASigXY",     &nTrkDCASigXY     );
+  reader->AddVariable( "nTrkDCASigZ",      &nTrkDCASigZ      );
+  reader->AddVariable( "Cent",             &cent             );
+
+  reader->AddSpectator( "mass",   &V0mass);
+  reader->AddSpectator( "eta",    &V0eta);
+  reader->AddSpectator( "phi",    &V0phi);
+  reader->AddSpectator( "pdgId",  &V0id);
+
+  reader->BookMVA( std::string("BDT")+Kshort, fip.fullPath().c_str());
+
+
+
+
+  //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+}
+
+
+RaghuV0Ana::~RaghuV0Ana()
+{
+  
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+  delete evt_; 
+}
+
+// ------------ method called for each event  ------------
+void
+RaghuV0Ana::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  using namespace edm;
+  //nTrk_corr_trg_ = std::vector<double>(pTmin_trg_.size(), 0.);
+  //nTrk_corr_ass_ = std::vector<double>(pTmin_ass_.size(), 0.);
+
+  zBestVtx1_ = -999.;
+  
+  LoopV0Vertices(iEvent, iSetup);
+  //LoopV0Vertices(iEvent, iSetup,false);
+
+
+  // ----- Fill and push evt containers -----                                                                                                    
+  evt_->run   = iEvent.id().run();
+  evt_->event = iEvent.id().event();
+  evt_->zvtx  = zBestVtx1_;
+  
+  evtVec_.push_back(*evt_);
+  
+  // ----- Reset evt container -----                                                                                                             
+  evt_->reset();
+}  
+
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void
+RaghuV0Ana::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void
+RaghuV0Ana::endJob()
+{
+  std::cout<< "Start sorting the events!" << std::endl;
+  std::sort(evtVec_.begin(),evtVec_.end());
+  std::cout<< "Finish sorting the events!" << std::endl;
+  
+  std::cout<< "Total of " << evtVec_.size() << " events are selected!" << std::endl;
+  
+  std::cout<< "Start running correlation analysis!" << std::endl;
+
+  for( unsigned int i = 0; i < evtVec_.size(); i++ )
+    {
+      
+      if( i % 100 == 0 ) std::cout << "Processing " << i << "th event" << std::endl;
+
+      //FillHistsSignal_match( i );
+      //FillHistsSignal_match_unmatch( i );
+      //FillHistsSignal_unmatch( i );
+      /*
+      int cntbin_i = GetCentbin(evtVec_[i].cntbin);
+
+      int nmix=0;
+
+      for( unsigned int j = 0; j < evtVec_.size(); j++ )
+        {
+          if(i == j) continue;
+
+          double deltazvtx = evtVec_[i].zvtx-evtVec_[j].zvtx;
+
+          if(fabs(deltazvtx) > 2.0) continue;
+
+          if( evtVec_[i].run ==  evtVec_[j].run && evtVec_[i].event == evtVec_[j].event ) continue;
+	  
+          int cntbin_j = GetCentbin(evtVec_[j].cntbin);
+
+	  if(cntbin_i != cntbin_j) continue;
+
+          nmix++;
+          if (nmix >=10) break;
+          FillHistsBackground( i, j );
+	  
+	  }*/
+    }
+}
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+RaghuV0Ana::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+//=========================================================================================================================
+void
+RaghuV0Ana::LoopV0Vertices(const edm::Event& iEvent,
+				   const edm::EventSetup& iSetup)
+  
+  
+{
+  using namespace edm;
+  using namespace std;
+    
+  edm::Handle< reco::VertexCollection > vertices;
+  iEvent.getByToken(vtxTags_, vertices);
+  
+  if(!vertices->size())
+    {
+      std::cout<<"Invalid or empty vertex collection!"<<std::endl;
+      return;
+    }
+  
+  reco::VertexCollection recoVertices = *vertices;
+  
+  sort(recoVertices.begin(), recoVertices.end(), [](const reco::Vertex &a, const reco::Vertex &b){
+      return a.tracksSize() > b.tracksSize();
+    });
+  
+  unsigned int primaryvtx = 0;
+  for ( primaryvtx = 0; primaryvtx < recoVertices.size(); primaryvtx++ ) {
+    if ( (!recoVertices[primaryvtx].isFake())
+         && fabs(recoVertices[primaryvtx].z()) <= 25.
+         && recoVertices[primaryvtx].position().Rho() <= 2.0
+         && recoVertices[primaryvtx].tracksSize() >=2 ) break;
+  }
+  reco::Vertex const * pv = &recoVertices[primaryvtx];
+  double zBestVtx_ = pv->z();
+  if (zBestVtx_ < zminVtx_ || zBestVtx_ > zmaxVtx_ ) return;
+  zBestVtx1_ = zBestVtx_;
+  
+  edm::ESHandle<TransientTrackBuilder> theB;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
+  
+  edm::Handle< reco::VertexCompositeCandidateCollection > V0s;
+  iEvent.getByToken(V0Src_, V0s);
+  
+  edm::Handle<int> pCent;
+  iEvent.getByToken(dbCent_, pCent);
+  cent = Float_t(*pCent);
+  if(cent >= 160) return;
+
+  hzvtx_->Fill(zBestVtx1_);  
+  hbin_->Fill(cent);
+
+
+  V0pt_vect.resize(0);
+  V0eta_vect.resize(0);
+  V0phi_vect.resize(0);
+  V0id_vect.resize(0);
+  V0mass_vect.resize(0);
+
+  pdau_pt_vect.resize(0);
+  pdau_eta_vect.resize(0);
+  pdau_phi_vect.resize(0);
+  pdau_chi2_vect.resize(0);
+
+  ndau_pt_vect.resize(0);
+  ndau_eta_vect.resize(0);
+  ndau_phi_vect.resize(0);
+  ndau_chi2_vect.resize(0);
+
+  V0pt_vect_unmatch.resize(0);
+  V0eta_vect_unmatch.resize(0);
+  V0phi_vect_unmatch.resize(0);
+  V0id_vect_unmatch.resize(0);
+  V0mass_vect_unmatch.resize(0);
+
+  pdau_pt_vect_unmatch.resize(0);
+  pdau_eta_vect_unmatch.resize(0);
+  pdau_phi_vect_unmatch.resize(0);
+  pdau_chi2_vect_unmatch.resize(0);
+
+  ndau_pt_vect_unmatch.resize(0);
+  ndau_eta_vect_unmatch.resize(0);
+  ndau_phi_vect_unmatch.resize(0);
+  ndau_chi2_vect_unmatch.resize(0);
+
+
+
+
+  reco::VertexCompositeCandidateCollection recV0 = *V0s;
+  for ( reco::VertexCompositeCandidateCollection::const_iterator recoV0s = recV0.begin();
+	recoV0s != recV0.end();
+	++recoV0s)
+    {
+      
+      V0id = recoV0s->pdgId();
+      if (fabs(V0id) != 3122) continue;
+      V0mass = recoV0s->mass();
+      
+      //Float_t pdgmass = 1.115683;
+      //Float_t pdgmass = 0.497611;
+      V0phi = recoV0s->phi();
+      V0pt = recoV0s->pt();
+      V0eta = recoV0s->eta();
+      V0rapidity = recoV0s->rapidity();
+      V0phi = recoV0s->phi();
+      GlobalPoint displacementFromPV ( (pv->x() - recoV0s->vx()), (pv->y() - recoV0s->vy()), (pv->z() - recoV0s->vz()) ) ;
+      V0lxyz = (displacementFromPV.mag());
+      V0Chi2 = recoV0s->vertexChi2();
+      
+      //3d pointing angle
+      V0cosThetaXYZ = -(displacementFromPV.x()*recoV0s->px() + displacementFromPV.y()*recoV0s->py() + displacementFromPV.z()*recoV0s->pz()) / ( displacementFromPV.mag()*sqrt(recoV0s->px()*recoV0s->px() + recoV0s->py()*recoV0s->py() + recoV0s->pz()*recoV0s->pz()) );
+      
+      
+      SMatrixSym3D V0totalCov = pv->covariance() + recoV0s->vertexCovariance();
+      
+      SVector3 V0distVecXYZ(displacementFromPV.x(), displacementFromPV.y(), displacementFromPV.z());
+      V0distMagXYZ = ROOT::Math::Mag(V0distVecXYZ);
+      V0sigmaDistMagXYZ = sqrt(ROOT::Math::Similarity(V0totalCov, V0distVecXYZ)) / V0distMagXYZ;
+      V0vtxDecaySigXYZ = V0distMagXYZ/V0sigmaDistMagXYZ;
+      
+      if ( V0pt > 8.5 || V0pt < 0.2 ) continue;
+      if ( V0rapidity > 2.5 || V0rapidity < -2.5 ) continue;
+      
+      dca = -999.;
+      double dauLongImpactSig1 = -999.;
+      double dauTransImpactSig1 = -999.;
+      double dauLongImpactSig2 = -999.;
+      double dauTransImpactSig2 = -999.;
+      
+      TVector3 pV0vector(recoV0s->px(), recoV0s->py(), recoV0s->pz());
+      
+      //double alpha , qt ,v0masspiproton1,v0masspiproton2;
+      double alpha , qt ,v0masspipi,v0massee;
+
+      if ( recoV0s->numberOfDaughters() != 2 ) continue;
+      auto bT0 = recoV0s->daughter(0)->bestTrack();
+      auto bT1 = recoV0s->daughter(1)->bestTrack();
+      if ( bT0 and bT1 ) {
+	auto tt0 = theB->build(bT0).initialFreeState();
+	auto tt1 = theB->build(bT1).initialFreeState();
+	
+	ClosestApproachInRPhi cApp;
+	cApp.calculate(tt0, tt1);
+	if (cApp.status()) {
+	  dca = std::abs(cApp.distance());
+	}
+      }
+      
+      auto d1 = recoV0s->daughter(0)->get<reco::TrackRef>();
+      auto d2 = recoV0s->daughter(1)->get<reco::TrackRef>();
+      
+      double xVtxError = pv->xError();
+      double yVtxError = pv->yError();
+      double zVtxError = pv->zError();
+      
+      math::XYZPoint bestvtx(pv->x(),pv->y(),pv->z());
+      
+      double dzvtx1 = d1->dz(bestvtx);
+      double dxyvtx1 = d1->dxy(bestvtx);
+      double dzerror1 = sqrt(d1->dzError()*d1->dzError()+zVtxError*zVtxError);
+      double dxyerror1 = sqrt(d1->d0Error()*d1->d0Error()+xVtxError*yVtxError);
+      
+      dauLongImpactSig1 = fabs(dzvtx1/dzerror1);
+      dauTransImpactSig1 = fabs(dxyvtx1/dxyerror1);
+      
+      double dzvtx2 = d2->dz(bestvtx);
+      double dxyvtx2 = d2->dxy(bestvtx);
+      double dzerror2 = sqrt(d2->dzError()*d2->dzError()+zVtxError*zVtxError);
+      double dxyerror2 = sqrt(d2->d0Error()*d2->d0Error()+xVtxError*yVtxError);
+      
+      dauLongImpactSig2 = fabs(dzvtx2/dzerror2);
+      dauTransImpactSig2 = fabs(dxyvtx2/dxyerror2);
+      
+      
+      double daupx1 = d1->px();
+      double daupy1 = d1->py();
+      double daupz1 = d1->pz();
+      double pd1 = d1->p();
+      
+      double daupx2 = d2->px();
+      double daupy2 = d2->py();
+      double daupz2 = d2->pz();
+      double pd2 = d2->p();
+      
+      TVector3 dauvec1(daupx1,daupy1,daupz1);
+      TVector3 dauvec2(daupx2,daupy2,daupz2);
+      TVector3 dauvecsum(dauvec1+dauvec2);
+      
+      double P1l = (pV0vector.Dot(dauvec1))/pV0vector.Mag();
+      double P2l = (pV0vector.Dot(dauvec2))/pV0vector.Mag();
+      
+      qt = ((dauvec1.Cross(dauvec2)).Mag())/pV0vector.Mag();
+      alpha = (P1l - P2l)/(P1l+P2l);
+      
+      /*      
+      v0masspiproton1 = sqrt((sqrt(0.93827*0.93827+pd1*pd1)+sqrt(0.13957*0.13957+pd2*pd2))*(sqrt(0.93827*0.93827+pd1*pd1)+sqrt (0.13957*0.13957+pd2*pd2))-dauvecsum.Mag2());
+      v0masspiproton2 = sqrt((sqrt(0.13957*0.13957+pd1*pd1)+sqrt(0.93827*0.93827+pd2*pd2))*(sqrt(0.13957*0.13957+pd1*pd1)+sqrt (0.93827*0.93827+pd2*pd2))-dauvecsum.Mag2());
+
+      if((v0masspiproton1>=(1.115683-mis_la_range_) && v0masspiproton1<=(1.115683+mis_la_range_)) || (v0masspiproton2>=(1.115683-mis_la_range_) && v0masspiproton2<=(1.115683+mis_la_range_)) ) continue;  
+      */
+
+      v0masspipi = sqrt((sqrt(0.13957*0.13957+pd1*pd1)+sqrt(0.13957*0.13957+pd2*pd2))*(sqrt(0.13957*0.13957+pd1*pd1)+sqrt(0.13957*0.13957+pd2*pd2))-dauvecsum.Mag2());
+      v0massee = sqrt((sqrt(0.000511*0.000511+pd1*pd1)+sqrt(0.000511*0.000511+pd2*pd2))*(sqrt(0.000511*0.000511+pd1*pd1)+sqrt(0.000511*0.000511+pd2*pd2))-dauvecsum.Mag2());
+
+      if((v0masspipi >= (0.497614-mis_ks_range_) && v0masspipi <= (0.497614+mis_ks_range_)) || v0massee <= mis_ph_range_ ) continue;
+
+
+      hV0pT_before_->Fill(V0pt);
+      
+      if ( recoV0s->daughter(0)->charge() > 0 ) 
+	{
+	  auto trk = dynamic_cast<const reco::RecoChargedCandidate*>(recoV0s->daughter(0))->track();
+          //pdau_chi2 = trk->chi2();
+          //pdau_ndf = trk->ndof();
+	  pdau_chi2 = trk-> normalizedChi2();
+          pdau_pt = trk->pt();
+          pdau_eta = trk->eta();
+          pdau_phi = trk->phi();
+	  pTrkNHit = trk->numberOfValidHits();	 
+	  pTrkPtError = trk->ptError();
+	  pTrkNPxLayer= trk->hitPattern().pixelLayersWithMeasurement();
+	  pTrkDCASigXY = dauTransImpactSig1;
+	  pTrkDCASigZ = dauLongImpactSig1;
+	  
+	}
+      else
+	{
+	  auto trk = dynamic_cast<const reco::RecoChargedCandidate*>(recoV0s->daughter(0))->track();
+          //ndau_chi2 = trk->chi2();
+          //ndau_ndf = trk->ndof();
+	  ndau_chi2 = trk-> normalizedChi2();
+	  ndau_pt = trk->pt();                                                                    
+	  ndau_eta = trk->eta();                        
+	  ndau_phi = trk->phi();
+	  nTrkNHit = trk->numberOfValidHits();
+          nTrkPtError = trk->ptError();
+          nTrkNPxLayer= trk->hitPattern().pixelLayersWithMeasurement();
+          nTrkDCASigXY = dauTransImpactSig1;
+          nTrkDCASigZ = dauLongImpactSig1;
+	  
+	}
+      
+      if ( recoV0s->daughter(1)->charge() > 0 )
+	{
+	  auto trk = dynamic_cast<const reco::RecoChargedCandidate*>(recoV0s->daughter(1))->track();
+          //pdau_chi2 = trk->chi2();
+          //pdau_ndf = trk->ndof();
+	  pdau_chi2 = trk-> normalizedChi2();
+	  pdau_pt = trk->pt();
+          pdau_eta = trk->eta();
+          pdau_phi = trk->phi();
+	  pTrkNHit = trk->numberOfValidHits();
+          pTrkPtError = trk->ptError();
+          pTrkNPxLayer= trk->hitPattern().pixelLayersWithMeasurement();
+          pTrkDCASigXY = dauTransImpactSig2;
+          pTrkDCASigZ = dauLongImpactSig2;
+	  
+	}
+      else
+	{
+	  auto trk = dynamic_cast<const reco::RecoChargedCandidate*>(recoV0s->daughter(1))->track();
+          //ndau_chi2 = trk->chi2();
+          //ndau_ndf = trk->ndof();
+	  ndau_chi2 = trk-> normalizedChi2();
+	  ndau_pt = trk->pt();
+          ndau_eta = trk->eta();
+          ndau_phi = trk->phi();
+	  nTrkNHit = trk->numberOfValidHits();
+          nTrkPtError = trk->ptError();
+          nTrkNPxLayer= trk->hitPattern().pixelLayersWithMeasurement();
+          nTrkDCASigXY = dauTransImpactSig2;
+          nTrkDCASigZ = dauLongImpactSig2;
+	  
+	}
+      
+      double mva = reader->EvaluateMVA(TString ("BDT")+Kshort);
+      
+      if ( mva <= mvaCut_ ) continue;
+      
+      if ( V0pt > pTmax_ || V0pt < pTmin_ ) continue;
+      if ( V0rapidity > Rapmax_ || V0rapidity < Rapmin_ ) continue;
+      if ( V0eta > Etamax_ || V0eta < Etamin_ ) continue;
+      if ( V0mass > Massmax_ || V0mass < Massmin_ ) continue;
+
+      //std::cout<<"pdau_chi2 is = "<< pdau_chi2 << "    "<< "ndau_chi2 is = "<<ndau_chi2<<std::endl;
+      //std::cout<<"pdau_ndf is = "<< pdau_ndf << "    "<< "ndau_ndf is = "<<ndau_ndf<<std::endl;
+      hV0mass_wocut_->Fill(V0mass);
+      hV0pT_->Fill(V0pt); 
+      harmen_wcut_ ->Fill(alpha,qt);
+      hV0phi_->Fill(V0phi);
+      hV0eta_->Fill(V0eta);
+
+      V0pt_vect_unmatch.push_back(V0pt);
+      V0eta_vect_unmatch.push_back(V0eta);
+      V0phi_vect_unmatch.push_back(V0phi);
+      V0id_vect_unmatch.push_back(V0id);
+      V0mass_vect_unmatch.push_back(V0mass);
+      
+      pdau_pt_vect_unmatch.push_back(pdau_pt);
+      pdau_eta_vect_unmatch.push_back(pdau_eta);
+      pdau_phi_vect_unmatch.push_back(pdau_phi);
+      pdau_chi2_vect_unmatch.push_back(pdau_chi2);
+      
+      ndau_pt_vect_unmatch.push_back(ndau_pt);
+      ndau_eta_vect_unmatch.push_back(ndau_eta);
+      ndau_phi_vect_unmatch.push_back(ndau_phi);
+      ndau_chi2_vect_unmatch.push_back(ndau_chi2);
+      
+      bool match = kFALSE;
+      //bool match;
+      edm::Handle< reco::GenParticleCollection > V0ss;
+      iEvent.getByToken(tracks_,V0ss);
+      for(reco::GenParticleCollection::const_iterator GenV0s = V0ss->begin();
+          GenV0s != V0ss->end();
+          ++GenV0s)
+        {
+          int V0id_gen = GenV0s->pdgId();
+          if (fabs(V0id_gen) != 3122) continue;
+
+          double V0eta_gen = GenV0s->eta();
+          double V0pt_gen = GenV0s->pt();
+          double V0phi_gen = GenV0s->phi();
+          double V0rapidity_gen = GenV0s->rapidity();
+	  
+	  if ( V0pt_gen > pTmax_ || V0pt_gen < pTmin_ ) continue;
+          if ( V0eta_gen > Etamax_ || V0eta_gen < Etamin_ ) continue;
+          if ( V0rapidity_gen > Rapmax_ || V0rapidity_gen < Rapmin_ ) continue;
+	  
+          double delR = fabs(sqrt(pow(V0phi - V0phi_gen,2) + pow(V0eta-V0eta_gen,2)));
+          double delpt_genpt = fabs((V0pt - V0pt_gen)/V0pt_gen);
+
+	  hdelR_->Fill(delR);
+	  hdelpt_->Fill(delpt_genpt);
+
+	  if (delR < del_R_ && delpt_genpt < del_R_)
+	    {
+	      match = kTRUE;
+	      break;
+	    }
+	  else  match = kFALSE;	    
+	}
+      
+      if (match)
+	{
+	  hV0mass_match_->Fill(V0mass);
+	  
+	  V0pt_vect.push_back(V0pt);
+	  V0eta_vect.push_back(V0eta);
+	  V0phi_vect.push_back(V0phi);
+	  V0id_vect.push_back(V0id);
+	  V0mass_vect.push_back(V0mass);
+	  
+	  pdau_pt_vect.push_back(pdau_pt);
+	  pdau_eta_vect.push_back(pdau_eta);
+	  pdau_phi_vect.push_back(pdau_phi);
+	  pdau_chi2_vect.push_back(pdau_chi2);
+	  
+	  ndau_pt_vect.push_back(ndau_pt);
+	  ndau_eta_vect.push_back(ndau_eta);
+	  ndau_phi_vect.push_back(ndau_phi);
+	  ndau_chi2_vect.push_back(ndau_chi2);
+	  
+	}
+      else 
+	{
+	  hV0mass_unmatch_->Fill(V0mass);
+	  continue;
+	}
+      
+    }
+  
+  //std::cout<<"matched particle  "<<V0pt_vect.size()<<std::endl;
+  for (unsigned int ntrk_1_reco = 0; ntrk_1_reco < V0pt_vect_unmatch.size(); ntrk_1_reco++)
+    {
+      //bool is_dcut_reco = kFALSE;
+
+      double pchi2_1_reco = pdau_chi2_vect_unmatch[ntrk_1_reco];
+      double nchi2_1_reco = ndau_chi2_vect_unmatch[ntrk_1_reco];
+      double V0id_pure_reco = V0id_vect[ntrk_1_reco];
+      for (unsigned int ntrk_2_reco = 0; ntrk_2_reco < V0pt_vect_unmatch.size(); ntrk_2_reco++)
+	{
+	  if(ntrk_2_reco == ntrk_1_reco) continue;
+
+	  double V0id_pure_reco2 = V0id_vect[ntrk_2_reco];
+
+	  if(V0id_pure_reco != V0id_pure_reco2) continue;
+
+	  double pchi2_2_reco = pdau_chi2_vect_unmatch[ntrk_2_reco];
+	  double nchi2_2_reco = ndau_chi2_vect_unmatch[ntrk_2_reco];
+
+	  double p_chi2_reco = fabs(pchi2_1_reco - pchi2_2_reco);
+          double n_chi2_reco = fabs(nchi2_1_reco - nchi2_2_reco);
+
+          hdaup_delchi2_reco_beforedau->Fill(p_chi2_reco);
+          hdaun_delchi2_reco_beforedau->Fill(n_chi2_reco);
+
+	  if ((p_chi2_reco == dau_etaphi_) || (n_chi2_reco == dau_etaphi_)) continue;
+	  
+	  hdaup_delchi2_reco_afterdau->Fill(p_chi2_reco);
+	  hdaun_delchi2_reco_afterdau->Fill(n_chi2_reco);
+	}
+    }
+  
+  for (unsigned int ntrk_1 = 0; ntrk_1 < V0pt_vect.size(); ntrk_1++)
+    {
+      bool is_dcut = kFALSE;
+
+      double V0pt_pure = V0pt_vect[ntrk_1];
+      double V0eta_pure = V0eta_vect[ntrk_1];
+      double V0phi_pure = V0phi_vect[ntrk_1];
+      double V0id_pure = V0id_vect[ntrk_1];
+      double V0mass_pure = V0mass_vect[ntrk_1];
+
+      double ppt_1 = pdau_pt_vect[ntrk_1];
+      double peta_1 = pdau_eta_vect[ntrk_1];
+      double pphi_1 = pdau_phi_vect[ntrk_1];
+      double pchi2_1 = pdau_chi2_vect[ntrk_1];                                                                          
+
+      double npt_1 = ndau_pt_vect[ntrk_1];
+      double neta_1 = ndau_eta_vect[ntrk_1];
+      double nphi_1 = ndau_phi_vect[ntrk_1];
+      double nchi2_1 = ndau_chi2_vect[ntrk_1];                                                                          
+
+      for (unsigned int ntrk_2 = 0; ntrk_2 < V0pt_vect.size(); ntrk_2++)
+	{
+	  if(ntrk_2 == ntrk_1) continue;
+
+	  double V0id_pure2 = V0id_vect[ntrk_2];
+	  if(V0id_pure != V0id_pure2) continue;
+	  double peta_2 = pdau_eta_vect[ntrk_2];
+	  double pphi_2 = pdau_phi_vect[ntrk_2];
+	  double pchi2_2 = pdau_chi2_vect[ntrk_2];                                                                      
+
+	  double neta_2 = ndau_eta_vect[ntrk_2];
+	  double nphi_2 = ndau_phi_vect[ntrk_2];
+	  double nchi2_2 = ndau_chi2_vect[ntrk_2];                                                                      
+
+	  double p_dphi = fabs(pphi_1 - pphi_2);
+	  double n_dphi = fabs(nphi_1 - nphi_2);
+
+	  double p_deta = fabs(peta_1 - peta_2);
+	  double n_deta = fabs(neta_1 - neta_2);
+
+	  double p_chi2 = fabs(pchi2_1 - pchi2_2);                                                                      
+	  double n_chi2 = fabs(nchi2_1 - nchi2_2);                                                                      
+	  hdaup_delchi2_beforedau->Fill(p_chi2);
+	  hdaun_delchi2_beforedau->Fill(n_chi2);
+	  //if ((p_deta == dau_etaphi_ && p_dphi == dau_etaphi_) || (n_deta == dau_etaphi_ && n_dphi == dau_etaphi_))
+	  if ((p_chi2 == dau_etaphi_) || (n_chi2 == dau_etaphi_)) continue;                                              
+
+	  hdaup_delchi2_afterdau->Fill(p_chi2);
+	  hdaun_delchi2_afterdau->Fill(n_chi2);
+	}
+      
+      int index = GetpTbin(V0pt_pure,is_dcut);
+      if(index == -1) continue;
+      
+      AssignpTbins(V0pt_pure, V0eta_pure, V0phi_pure, V0id_pure, V0mass_pure, ppt_1, peta_1, pphi_1, npt_1, neta_1, nphi_1, index, is_dcut);
+
+    }
+  V0pt_vect.clear();
+  V0eta_vect.clear();
+  V0phi_vect.clear();
+  V0id_vect.clear();
+  V0mass_vect.clear();
+
+  pdau_pt_vect.clear();
+  pdau_eta_vect.clear();
+  pdau_phi_vect.clear();
+  pdau_chi2_vect.clear();
+
+  ndau_pt_vect.clear();
+  ndau_eta_vect.clear();
+  ndau_phi_vect.clear();
+  ndau_chi2_vect.clear();
+
+  V0pt_vect_unmatch.clear();
+  V0eta_vect_unmatch.clear();
+  V0phi_vect_unmatch.clear();
+  V0id_vect_unmatch.clear();
+  V0mass_vect_unmatch.clear();
+
+  pdau_pt_vect_unmatch.clear();
+  pdau_eta_vect_unmatch.clear();
+  pdau_phi_vect_unmatch.clear();
+  pdau_chi2_vect_unmatch.clear();
+
+  ndau_pt_vect_unmatch.clear();
+  ndau_eta_vect_unmatch.clear();
+  ndau_phi_vect_unmatch.clear();
+  ndau_chi2_vect_unmatch.clear();
+
+
+}
+
+//======================================================================
+int
+RaghuV0Ana::GetpTbin(double V0pt, bool is_dcut)
+{
+  int idx = -1;
+  if(is_dcut)
+    {
+      for(unsigned int trgidx = 0; trgidx < pTmin_trg_.size(); ++trgidx)
+	
+	{
+	  if(V0pt >= pTmin_trg_[trgidx] && V0pt <= pTmax_trg_[trgidx])
+	    idx = trgidx;
+	}
+    }
+  else
+    {
+      for(unsigned int assidx = 0; assidx < pTmin_ass_.size(); ++assidx)
+	
+	{
+	  if(V0pt >= pTmin_ass_[assidx] && V0pt <= pTmax_ass_[assidx])
+	    idx = assidx;
+	}
+    }
+  return idx;
+}
+//===========================================================================================================================================
+void
+RaghuV0Ana::AssignpTbins(double V0pt, double V0eta, double V0phi,int V0id, double V0mass, double pdau_pt, double pdau_eta, double pdau_phi, double ndau_pt, double ndau_eta, double ndau_phi, int idx, bool is_dcut)
+  
+  
+{
+  TLorentzVector pvector;                    
+  pvector.SetPtEtaPhiM(V0pt, V0eta, V0phi, V0mass);
+  TLorentzVector pvector_pdau;
+  pvector_pdau.SetPtEtaPhiM(pdau_pt, pdau_eta, pdau_phi, 0.139570 );
+  TLorentzVector pvector_ndau;
+  pvector_ndau.SetPtEtaPhiM(ndau_pt, ndau_eta, ndau_phi, 0.139570 );
+
+  if(fabs(V0id) == 3122)
+    
+    {  
+      if(is_dcut)
+	{
+	  (evt_->pVect_trg[idx]).push_back(pvector);
+	  (evt_->chgVect_trg[idx]).push_back(V0id);
+	  (evt_->pVect_daup_trg[idx]).push_back(pvector_pdau);
+	  (evt_->pVect_daun_trg[idx]).push_back(pvector_ndau);
+	  hV0mass1_trg_[idx]->Fill(V0mass);
+	}
+      else
+	{
+	  (evt_->pVect_ass[idx]).push_back(pvector);
+	  (evt_->chgVect_ass[idx]).push_back(V0id);
+	  (evt_->pVect_daup_ass[idx]).push_back(pvector_pdau);
+	  (evt_->pVect_daun_ass[idx]).push_back(pvector_ndau);
+	  hV0mass2_ass_[idx]->Fill(V0mass);
+	}
+    }
+  else return;
+}
+
+
+//=============================================================================================================================================
+
+double RaghuV0Ana::GetQInv(double px1,double py1,double pz1,double E1,double px2,double py2,double pz2,double E2)
+{
+  double Qinv;
+  
+  Qinv = sqrt(fabs(pow(px1-px2,2)+pow(py1-py2,2)+pow(pz1-pz2,2) - pow(E1-E2,2)));
+  return Qinv;
+}
+
+//==============================================================================================================================================
+double RaghuV0Ana::GetQInvbais(double px11,double py11,double pz11,double E11,double px22,double py22,double pz22,double E22)
+{
+  double Qinv_bais;
+  
+  Qinv_bais = sqrt(fabs(pow(px11-px22,2)+pow(py11-py22,2)+pow(pz11-pz22,2) - pow(E11-E22,2)));
+  return Qinv_bais;
+}
+//==============================================================================================================================================
+double RaghuV0Ana::GetQInv_daup(double px1_daup_ass,double py1_daup_ass,double pz1_daup_ass,double E1_daup_ass,double px1_daup_trg,double py1_daup_trg,double pz1_daup_trg,double E1_daup_trg)
+{
+  double Qinv_daup;
+  
+  Qinv_daup = sqrt(fabs(pow(px1_daup_ass-px1_daup_trg,2)+pow(py1_daup_ass-py1_daup_trg,2)+pow(pz1_daup_ass-pz1_daup_trg,2) - pow(E1_daup_ass-E1_daup_trg,2)));
+  return Qinv_daup;
+}
+//========================================================================================================
+double RaghuV0Ana::GetQInv_daun(double px1_daun_ass,double py1_daun_ass,double pz1_daun_ass,double E1_daun_ass,double px1_daun_trg,double py1_daun_trg,double pz1_daun_trg,double E1_daun_trg)
+{
+  double Qinv_daun;
+  
+  Qinv_daun = sqrt(fabs(pow(px1_daun_ass-px1_daun_trg,2)+pow(py1_daun_ass-py1_daun_trg,2)+pow(pz1_daun_ass-pz1_daun_trg,2) - pow(E1_daun_ass-E1_daun_trg,2)));
+  return Qinv_daun;
+}			
+//========================================================================================================
+void
+RaghuV0Ana::FillHistsSignal_match(int ievt)
+{
+  for( unsigned int itrg = 0; itrg < pTmin_trg_.size(); itrg++ )
+    {
+      for( unsigned int jass = 0; jass < pTmin_ass_.size(); jass++ )
+	{
+	  if( itrg < jass )
+	    {
+	      std::cout<<"itrg < jass"<<std::endl;
+	      continue;
+	    }
+
+	  unsigned int ntrgsize = evtVec_[ievt].pVect_trg[itrg].size();
+	  unsigned int nasssize = evtVec_[ievt].pVect_ass[itrg].size();
+	  
+	  for( unsigned int ntrg = 0; ntrg < ntrgsize; ntrg++ )
+	    {
+	      TLorentzVector pvector_trg = (evtVec_[ievt].pVect_trg[itrg])[ntrg];
+	      double px_trg = pvector_trg.Px();
+	      double py_trg = pvector_trg.Py();
+	      double pz_trg = pvector_trg.Pz();
+	      double V0mass_trg = pvector_trg.M();
+	      double E_trg = pvector_trg.E();
+	      //int V0id_trg = (evtVec_[ievt].chgVect_trg[itrg])[ntrg];
+	      /*
+	      TLorentzVector pvector_daup_trg = (evtVec_[ievt].pVect_daup_trg[itrg])[ntrg];
+	      TLorentzVector pvector_daun_trg = (evtVec_[ievt].pVect_daun_trg[itrg])[ntrg];
+	      
+  	      double eta_daup_trg = pvector_daup_trg.Eta();
+  	      double phi_daup_trg = pvector_daup_trg.Phi();
+              	      
+	      double eta_daun_trg = pvector_daun_trg.Eta();
+  	      double phi_daun_trg = pvector_daun_trg.Phi();
+	      */      
+	      for( unsigned int nass = 0 ; nass < nasssize; nass++ )
+		
+		{
+		  TLorentzVector pvector_ass = (evtVec_[ievt].pVect_ass[jass])[nass];
+		  double px_ass = pvector_ass.Px();
+		  double py_ass = pvector_ass.Py();
+		  double pz_ass = pvector_ass.Pz();
+		  double V0mass_ass = pvector_ass.M();
+		  double E_ass = pvector_ass.E();
+		  //int V0id_ass = (evtVec_[ievt].chgVect_ass[jass])[nass];
+		
+		  /*  		  
+		  TLorentzVector pvector_daup_ass = (evtVec_[ievt].pVect_daup_ass[jass])[nass];
+		  TLorentzVector pvector_daun_ass = (evtVec_[ievt].pVect_daun_ass[jass])[nass];
+		  
+		  double eta_daup_ass = pvector_daup_ass.Eta();
+		  double phi_daup_ass = pvector_daup_ass.Phi();
+		  
+		  double eta_daun_ass = pvector_daun_ass.Eta();
+		  double phi_daun_ass = pvector_daun_ass.Phi();
+		  */		  
+		  if (px_trg == px_ass && py_trg == py_ass && pz_trg == pz_ass && V0mass_trg == V0mass_ass) continue;
+
+		  //if ((V0mass_trg < 0.492 || V0mass_trg > 0.503) && (V0mass_ass < 0.492 || V0mass_ass> 0.503)) continue;
+
+		  //if (V0id_trg != V0id_ass)continue;
+
+		  double Q_inv_bais = GetQInvbais(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		  hV0mass_sig_bais_match->Fill(Q_inv_bais);
+		  /*
+                    double Q_inv = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+                  
+		  //hV0mass_sig_before_match->Fill(Q_inv);
+                  		  
+		  if ((fabs(eta_daup_trg-eta_daup_ass) == dau_etaphi_ && fabs(phi_daup_trg-phi_daup_ass) == dau_etaphi_) || (fabs(eta_daun_trg-eta_daun_ass) == dau_etaphi_ && fabs(phi_daun_trg-phi_daun_ass)== dau_etaphi_))
+		    {
+		      double Q_inv_bais = GetQInvbais(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_bais_match->Fill(Q_inv_bais);
+
+		      continue;
+		    }
+                  else
+                    {
+		      double Q_inv1 = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_after_match->Fill(Q_inv1);
+		      }*/
+		}
+	    }
+	}
+    }
+}
+//===============================================================================================================================
+void
+RaghuV0Ana::FillHistsSignal_match_unmatch(int ievt)
+{
+  for( unsigned int itrg = 0; itrg < pTmin_trg_.size(); itrg++ )
+    {
+      for( unsigned int jass = 0; jass < pTmin_ass_.size(); jass++ )
+	{
+	  if( itrg < jass )
+	    {
+	      std::cout<<"itrg < jass"<<std::endl;
+	      continue;
+	    }
+
+	  unsigned int ntrgsize = evtVec_[ievt].pVect_trg[itrg].size();
+	  unsigned int nasssize = evtVec_[ievt].pVect_ass[itrg].size();
+	  
+	  for( unsigned int ntrg = 0; ntrg < ntrgsize; ntrg++ )
+	    {
+	      TLorentzVector pvector_trg = (evtVec_[ievt].pVect_trg[itrg])[ntrg];
+	      double px_trg = pvector_trg.Px();
+	      double py_trg = pvector_trg.Py();
+	      double pz_trg = pvector_trg.Pz();
+	      double V0mass_trg = pvector_trg.M();
+	      double E_trg = pvector_trg.E();
+	      int V0id_trg = (evtVec_[ievt].chgVect_trg[itrg])[ntrg];
+
+	      TLorentzVector pvector_daup_trg = (evtVec_[ievt].pVect_daup_trg[itrg])[ntrg];
+	      TLorentzVector pvector_daun_trg = (evtVec_[ievt].pVect_daun_trg[itrg])[ntrg];
+	      
+  	      double eta_daup_trg = pvector_daup_trg.Eta();
+  	      double phi_daup_trg = pvector_daup_trg.Phi();
+              	      
+	      double eta_daun_trg = pvector_daun_trg.Eta();
+  	      double phi_daun_trg = pvector_daun_trg.Phi();
+              	      
+	      for( unsigned int nass = 0 ; nass < nasssize; nass++ )
+		
+		{
+		  TLorentzVector pvector_ass = (evtVec_[ievt].pVect_ass[jass])[nass];
+		  double px_ass = pvector_ass.Px();
+		  double py_ass = pvector_ass.Py();
+		  double pz_ass = pvector_ass.Pz();
+		  double V0mass_ass = pvector_ass.M();
+		  double E_ass = pvector_ass.E();
+		  int V0id_ass = (evtVec_[ievt].chgVect_ass[jass])[nass];
+		  		  
+		  TLorentzVector pvector_daup_ass = (evtVec_[ievt].pVect_daup_ass[jass])[nass];
+		  TLorentzVector pvector_daun_ass = (evtVec_[ievt].pVect_daun_ass[jass])[nass];
+		  
+		  double eta_daup_ass = pvector_daup_ass.Eta();
+		  double phi_daup_ass = pvector_daup_ass.Phi();
+		  
+		  double eta_daun_ass = pvector_daun_ass.Eta();
+		  double phi_daun_ass = pvector_daun_ass.Phi();
+		  		  
+		  if (px_trg == px_ass && py_trg == py_ass && pz_trg == pz_ass && V0mass_trg == V0mass_ass) continue;
+
+		  if ((V0mass_trg < 1.1115 || V0mass_trg >1.12) && (V0mass_ass < 1.1115 || V0mass_ass> 1.12)) continue;
+
+		  if( (V0id_trg == 3122 && V0id_ass == -3122) ||  (V0id_trg == -3122 && V0id_ass == 3122)) continue;
+		  
+                  double Q_inv = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+                  
+		  hV0mass_sig_before_match_unmatch->Fill(Q_inv);
+                  		  
+		  if ((fabs(eta_daup_trg-eta_daup_ass) == dau_etaphi_ && fabs(phi_daup_trg-phi_daup_ass) == dau_etaphi_) || (fabs(eta_daun_trg-eta_daun_ass) == dau_etaphi_ && fabs(phi_daun_trg-phi_daun_ass)== dau_etaphi_))
+		    {
+		      		      
+		      double Q_inv_bais = GetQInvbais(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_bais_match_unmatch->Fill(Q_inv_bais);
+		      continue;
+		    }
+                  else
+                    {
+		      double Q_inv1 = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_after_match_unmatch->Fill(Q_inv1);
+		    }
+		}
+	    }
+	}
+    }
+}
+//==========================================================================================================================================
+void
+RaghuV0Ana::FillHistsSignal_unmatch(int ievt)
+{
+  for( unsigned int itrg = 0; itrg < pTmin_trg_.size(); itrg++ )
+    {
+      for( unsigned int jass = 0; jass < pTmin_ass_.size(); jass++ )
+	{
+	  if( itrg < jass )
+	    {
+	      std::cout<<"itrg < jass"<<std::endl;
+	      continue;
+	    }
+
+	  unsigned int nasssize = evtVec_[ievt].pVect_ass[itrg].size();
+	  
+	  for( unsigned int ntrg = 0; ntrg < nasssize; ntrg++ )
+	    {
+	      TLorentzVector pvector_trg = (evtVec_[ievt].pVect_ass[itrg])[ntrg];
+	      double px_trg = pvector_trg.Px();
+	      double py_trg = pvector_trg.Py();
+	      double pz_trg = pvector_trg.Pz();
+	      double V0mass_trg = pvector_trg.M();
+	      double E_trg = pvector_trg.E();
+	      int V0id_trg = (evtVec_[ievt].chgVect_ass[itrg])[ntrg];
+
+	      TLorentzVector pvector_daup_trg = (evtVec_[ievt].pVect_daup_ass[itrg])[ntrg];
+	      TLorentzVector pvector_daun_trg = (evtVec_[ievt].pVect_daun_ass[itrg])[ntrg];
+	      
+  	      double eta_daup_trg = pvector_daup_trg.Eta();
+  	      double phi_daup_trg = pvector_daup_trg.Phi();
+              	      
+	      double eta_daun_trg = pvector_daun_trg.Eta();
+  	      double phi_daun_trg = pvector_daun_trg.Phi();
+              	      
+	      for( unsigned int nass = ntrg+1 ; nass < nasssize; nass++ ) 
+		
+		{
+		  TLorentzVector pvector_ass = (evtVec_[ievt].pVect_ass[jass])[nass];
+		  double px_ass = pvector_ass.Px();
+		  double py_ass = pvector_ass.Py();
+		  double pz_ass = pvector_ass.Pz();
+		  double V0mass_ass = pvector_ass.M();
+		  double E_ass = pvector_ass.E();
+		  int V0id_ass = (evtVec_[ievt].chgVect_ass[jass])[nass];
+		  		  
+		  TLorentzVector pvector_daup_ass = (evtVec_[ievt].pVect_daup_ass[jass])[nass];
+		  TLorentzVector pvector_daun_ass = (evtVec_[ievt].pVect_daun_ass[jass])[nass];
+		  
+		  double eta_daup_ass = pvector_daup_ass.Eta();
+		  double phi_daup_ass = pvector_daup_ass.Phi();
+		  
+		  double eta_daun_ass = pvector_daun_ass.Eta();
+		  double phi_daun_ass = pvector_daun_ass.Phi();
+		  		  
+		  if (px_trg == px_ass && py_trg == py_ass && pz_trg == pz_ass && V0mass_trg == V0mass_ass) continue;
+
+		  if ((V0mass_trg < 1.1115 || V0mass_trg >1.12) && (V0mass_ass < 1.1115 || V0mass_ass> 1.12)) continue;
+
+		  if( (V0id_trg == 3122 && V0id_ass == -3122) ||  (V0id_trg == -3122 && V0id_ass == 3122)) continue;
+		  
+                  double Q_inv = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+                  
+		  hV0mass_sig_before_unmatch->Fill(Q_inv);
+                  		  
+		  if ((fabs(eta_daup_trg-eta_daup_ass) == dau_etaphi_ && fabs(phi_daup_trg-phi_daup_ass) == dau_etaphi_) || (fabs(eta_daun_trg-eta_daun_ass) == dau_etaphi_ && fabs(phi_daun_trg-phi_daun_ass)== dau_etaphi_))
+		    {
+		      		      
+		      double Q_inv_bais = GetQInvbais(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_bais_unmatch->Fill(Q_inv_bais);
+		      continue;
+		    }
+                  else
+                    {
+		      double Q_inv1 = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      hV0mass_sig_after_unmatch->Fill(Q_inv1);
+		    }
+		}
+	    }
+	}
+    }
+}
+//==========================================================================================================================================
+void
+RaghuV0Ana::FillHistsBackground(int ievt_trg, int jevt_ass)
+{
+  if( evtVec_[ievt_trg].run ==  evtVec_[jevt_ass].run &&
+      evtVec_[ievt_trg].event == evtVec_[jevt_ass].event )
+    {
+      std::cout << "Event are the same. Skipping it" << std::endl;
+      return;
+    }
+  
+  for( unsigned int itrg = 0; itrg < pTmin_trg_.size(); itrg++ )
+    {
+      for( unsigned int jass = 0; jass < pTmin_ass_.size(); jass++ )
+        {
+          if( itrg < jass ) continue;
+	  
+          unsigned int ntrgsize = evtVec_[ievt_trg].pVect_trg[itrg].size();
+          unsigned int nasssize = evtVec_[jevt_ass].pVect_ass[jass].size();
+
+	  	  
+	  for( unsigned int ntrg = 0; ntrg < ntrgsize; ntrg++ )
+	    {
+	      TLorentzVector pvector_trg = (evtVec_[ievt_trg].pVect_trg[itrg])[ntrg];
+	      double px_trg = pvector_trg.Px();
+	      double py_trg = pvector_trg.Py();
+	      double pz_trg = pvector_trg.Pz();
+	      double V0mass_trg = pvector_trg.M();
+	      double E_trg = pvector_trg.E();
+	      int V0id_trg = (evtVec_[ievt_trg].chgVect_trg[itrg])[ntrg];
+	          
+	      TLorentzVector pvector_daup_trg = (evtVec_[ievt_trg].pVect_daup_trg[itrg])[ntrg];
+              TLorentzVector pvector_daun_trg = (evtVec_[ievt_trg].pVect_daun_trg[itrg])[ntrg];
+
+
+              double eta_daup_trg = pvector_daup_trg.Eta();
+              double phi_daup_trg = pvector_daup_trg.Phi();
+
+	      double eta_daun_trg = pvector_daun_trg.Eta();
+              double phi_daun_trg = pvector_daun_trg.Phi();
+	      /*
+              double px_daup_trg = pvector_daup_trg.Px();
+              double py_daup_trg = pvector_daup_trg.Py();
+              double pz_daup_trg = pvector_daup_trg.Pz();
+              double pt_daup_trg = pvector_daup_trg.Pt();
+
+
+              TVector3 p_dau_trg (px_daup_trg, py_daup_trg, pz_daup_trg);
+
+              double px_daun_trg = pvector_daun_trg.Px();
+              double py_daun_trg = pvector_daun_trg.Py();
+              double pz_daun_trg = pvector_daun_trg.Pz();
+              double pt_daun_trg = pvector_daun_trg.Pt();
+
+              TVector3 n_dau_trg (px_daun_trg, py_daun_trg, pz_daun_trg);
+	      */
+
+	      
+	      for( unsigned int nass = 0; nass < nasssize; nass++ )
+		{
+		  TLorentzVector pvector_ass = (evtVec_[jevt_ass].pVect_ass[jass])[nass];
+		  double px_ass = pvector_ass.Px();
+		  double py_ass = pvector_ass.Py();
+		  double pz_ass = pvector_ass.Pz();
+		  double V0mass_ass = pvector_ass.M();
+		  double E_ass = pvector_ass.E();
+		  int V0id_ass = (evtVec_[jevt_ass].chgVect_ass[jass])[nass];		  
+
+		  TLorentzVector pvector_daup_ass = (evtVec_[jevt_ass].pVect_daup_ass[jass])[nass];
+                  TLorentzVector pvector_daun_ass = (evtVec_[jevt_ass].pVect_daun_ass[jass])[nass];
+
+		  double eta_daup_ass = pvector_daup_ass.Eta();
+                  double phi_daup_ass = pvector_daup_ass.Phi();
+
+		  double eta_daun_ass = pvector_daun_ass.Eta();
+                  double phi_daun_ass = pvector_daun_ass.Phi();
+
+                  //double px_daup_ass = pvector_daup_ass.Px();
+                  //double py_daup_ass = pvector_daup_ass.Py();
+                  //double pz_daup_ass = pvector_daup_ass.Pz();
+                  //double pt_daup_ass = pvector_daup_ass.Pt();
+
+                  //TVector3 p_dau_ass (px_daup_ass, py_daup_ass, pz_daup_ass);
+
+                  //double px_daun_ass = pvector_daun_ass.Px();
+                  //double py_daun_ass = pvector_daun_ass.Py();
+                  //double pz_daun_ass = pvector_daun_ass.Pz();
+                  //double pt_daun_ass = pvector_daun_ass.Pt();
+		  
+                  //TVector3 n_dau_ass (px_daun_ass, py_daun_ass, pz_daun_ass);
+		  
+                  //double daup_costheta = (p_dau_trg.Dot(p_dau_ass))/(p_dau_trg.Mag()*p_dau_ass.Mag());
+                  //double daun_costheta = (n_dau_trg.Dot(n_dau_ass))/(n_dau_trg.Mag()*n_dau_ass.Mag());	
+		  
+		  if (px_trg == px_ass && py_trg == py_ass && pz_trg == pz_ass && V0mass_trg == V0mass_ass) continue;
+		  
+		  if ((V0mass_trg < 1.1115 || V0mass_trg >1.12) && (V0mass_ass < 1.1115 || V0mass_ass> 1.12)) continue;
+
+		  if( (V0id_trg == 3122 && V0id_ass == -3122) || (V0id_trg == -3122 && V0id_ass == 3122)) continue;
+			  
+		  double Q_inv = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		  
+		  hV0mass_back_before->Fill(Q_inv);
+
+		  if ((fabs(eta_daup_trg-eta_daup_ass) == dau_etaphi_ && fabs(phi_daup_trg-phi_daup_ass) == dau_etaphi_) || (fabs(eta_daun_trg-eta_daun_ass) == dau_etaphi_ && fabs(phi_daun_trg-phi_daun_ass)== dau_etaphi_))
+
+		    {
+		      double Q_inv_bais = GetQInvbais(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+                      hV0mass_back_bais->Fill(Q_inv_bais);
+                      continue;
+		    }
+
+		  else
+		    {
+		      double Q_inv1 = GetQInv(px_ass,py_ass,pz_ass,E_ass,px_trg,py_trg,pz_trg,E_trg);
+		      
+		      hV0mass_back_after->Fill(Q_inv1);
+		    }
+		  
+		  /* if ((V0mass_trg >= 1.1115 && V0mass_trg <= 1.12) && ((V0mass_ass >= 1.08 && V0mass_ass <= 1.10)|| (V0mass_ass >= 1.14 && V0mass_ass <= 1.16)))
+		    
+		    {
+		      hV0mass_back_ABB->Fill(Q_inv);
+		    }
+		  if (((V0mass_trg >= 1.08 && V0mass_trg <= 1.10)|| (V0mass_trg >= 1.14 && V0mass_trg <= 1.16)) && ((V0mass_ass >= 1.08 && V0mass_ass <= 1.10)|| (V0mass_ass >= 1.14 && V0mass_ass <= 1.16)))
+		    {
+		      hV0mass_back_BB->Fill(Q_inv);
+		      }*/
+		}
+	    }
+	}
+    }
+}
+
+//==========================================================================================================================================  
+int RaghuV0Ana::GetCentbin(float cent)
+{
+  int cbin = hcent_bin->FindBin(cent/2.)-1;
+  return cbin;
+}
+//==========================================================================================================================================  
+DEFINE_FWK_MODULE(RaghuV0Ana);

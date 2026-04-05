@@ -1,0 +1,113 @@
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 Running on: Linux lxplus802.cern.ch 4.18.0-553.85.1.el8_10.x86_64 #1 SMP Thu Nov 13 12:55:12 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 Not using Singularity
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 Operating System: Red Hat Enterprise Linux 8.10 (Ootpa)
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 Executing command: 'submit'
+DEBUG 2026-01-11 11:11:58.001 UTC: 	 Found CRAB cache file /afs/cern.ch/user/b/bibehera/.crab3
+INFO 2026-01-11 11:11:58.002 UTC: 	 Will use CRAB configuration file crab_config2.py
+DEBUG 2026-01-11 11:11:58.002 UTC: 	 Loading CRAB configuration file.
+DEBUG 2026-01-11 11:11:58.015 UTC: 	 Overriden parameter General.requestName with '2pc_OO_V0_IM_effcorr_cent0to50_newpT_v1_IP10'
+DEBUG 2026-01-11 11:11:58.015 UTC: 	 Overriden parameter Data.inputDataset with '/IonPhysics10/bibehera-2pc_OO_V0_IP10-ca42279dfc2dce710b3991c24f27a617/USER'
+DEBUG 2026-01-11 11:11:58.015 UTC: 	 Overriden parameter Data.secondaryInputDataset with '/IonPhysics10/OORun2025-PromptReco-v1/MINIAOD'
+DEBUG 2026-01-11 11:11:58.015 UTC: 	 Overriden parameter Data.outputDatasetTag with '2pc_OO_V0_IM_effcorr_cent0to50_newpT_v1_IP10'
+DEBUG 2026-01-11 11:11:58.015 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2026-01-11 11:11:58.025 UTC: 	 Checking credentials
+DEBUG 2026-01-11 11:11:58.025 UTC: 	 Found proxy file /tmp/x509up_u177753
+DEBUG 2026-01-11 11:11:58.025 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2026-01-11 11:11:58.025 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u177753
+DEBUG 2026-01-11 11:11:58.055 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2026-01-11 11:11:58.055 UTC: 	 Getting proxy life time left
+DEBUG 2026-01-11 11:11:58.055 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u177753
+DEBUG 2026-01-11 11:11:58.079 UTC: 	 output : 41402
+41402
+
+ error: 
+ retcode : 0
+DEBUG 2026-01-11 11:11:58.079 UTC: 	 Proxy valid for 11:30:02 hours
+DEBUG 2026-01-11 11:11:58.079 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2026-01-11 11:11:58.139 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2026-01-11 11:11:58.139 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u177753
+DEBUG 2026-01-11 11:11:58.164 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+
+ error: 
+ retcode : 0
+DEBUG 2026-01-11 11:11:58.164 UTC: 	 Getting myproxy life time left for bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+DEBUG 2026-01-11 11:11:58.164 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+DEBUG 2026-01-11 11:11:58.470 UTC: 	 output : username: bfbdf12a5670e45fdd055ff115afbb0f25b8a072
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+  renewal policy: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 345:42:39  (14.4 days)
+
+ error: 
+ retcode : 0
+DEBUG 2026-01-11 11:11:58.471 UTC: 	 Myproxy is valid: 1244520
+DEBUG 2026-01-11 11:11:58.471 UTC: 	 Executing command :
+ openssl x509 -noout -dates -in ~/.globus/usercert.pem
+DEBUG 2026-01-11 11:11:58.495 UTC: 	 output : notBefore=Dec 26 20:25:15 2025 GMT
+notAfter=Jan 30 20:25:15 2027 GMT
+
+ error: 
+ retcode : 0
+DEBUG 2026-01-11 11:11:58.501 UTC: 	 Delegating a myproxy for 720:00 hours
+DEBUG 2026-01-11 11:11:58.501 UTC: 	 Executing command :
+ export GT_PROXY_MODE=rfc ; myproxy-init -d -n -s myproxy.cern.ch -C ~/.globus/usercert.pem -y ~/.globus/userkey.pem -x -R '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -x -Z '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -l bfbdf12a5670e45fdd055ff115afbb0f25b8a072 -t 168 -c 720:00
+DEBUG 2026-01-11 11:13:58.665 UTC: 	 output : Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+Creating proxy ......................................................................................................... Done
+Proxy Verify OK
+Your proxy is valid until: Tue Feb 10 12:13:58 2026
+
+ error: Failed reading length 0
+Error authenticating: Connection closed.
+
+ retcode : 1
+ERROR 2026-01-11 11:13:58.665 UTC: 	 Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+Creating proxy ......................................................................................................... Done
+Proxy Verify OK
+Your proxy is valid until: Tue Feb 10 12:13:58 2026
+
+Failed reading length 0
+Error authenticating: Connection closed.
+
+ERROR 2026-01-11 11:13:58.665 UTC: 	 Problems delegating My-proxy.
+Error trying to create credential:
+ Problems delegating My-proxy. Error executing export GT_PROXY_MODE=rfc ; myproxy-init -d -n -s myproxy.cern.ch -C ~/.globus/usercert.pem -y ~/.globus/userkey.pem -x -R '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -x -Z '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -l bfbdf12a5670e45fdd055ff115afbb0f25b8a072 -t 168 -c 720:00:
+Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+Creating proxy ......................................................................................................... Done
+Proxy Verify OK
+Your proxy is valid until: Tue Feb 10 12:13:58 2026
+
+Failed reading length 0
+Error authenticating: Connection closed.
+
+ERROR 2026-01-11 11:13:58.667 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/lib/CRABClient/Commands/SubCommand.py", line 383, in __init__
+    self.handleMyProxy()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/lib/CRABClient/Commands/SubCommand.py", line 521, in handleMyProxy
+    raise ProxyCreationException("Problems delegating My-proxy.\n%s" % msg1)
+CRABClient.ClientExceptions.ProxyCreationException: Problems delegating My-proxy.
+Error trying to create credential:
+ Problems delegating My-proxy. Error executing export GT_PROXY_MODE=rfc ; myproxy-init -d -n -s myproxy.cern.ch -C ~/.globus/usercert.pem -y ~/.globus/userkey.pem -x -R '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -x -Z '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -l bfbdf12a5670e45fdd055ff115afbb0f25b8a072 -t 168 -c 720:00:
+Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=bibehera/CN=882295/CN=Bismita Behera
+Creating proxy ......................................................................................................... Done
+Proxy Verify OK
+Your proxy is valid until: Tue Feb 10 12:13:58 2026
+
+Failed reading length 0
+Error authenticating: Connection closed.
+
+INFO 2026-01-11 11:13:58.675 UTC: 	 Log file is /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_cent0to50_newpT_v1_IP10/crab.log

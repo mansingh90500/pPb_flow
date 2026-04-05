@@ -1,0 +1,182 @@
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 Running on: Linux lxplus974.cern.ch 5.14.0-611.27.1.el9_7.x86_64 #1 SMP PREEMPT_DYNAMIC Tue Jan 20 05:28:20 EST 2026 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 Using SINGULARITY image: el7:x86_64
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 Operating System: CentOS Linux 7 (Core)
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 Executing command: 'submit'
+DEBUG 2026-04-01 20:25:07.959 UTC: 	 Found CRAB cache file /afs/cern.ch/user/s/singhm/.crab3
+INFO 2026-04-01 20:25:07.962 UTC: 	 Will use CRAB configuration file crab_config_pPb.py
+DEBUG 2026-04-01 20:25:07.962 UTC: 	 Loading CRAB configuration file.
+DEBUG 2026-04-01 20:25:07.989 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2026-04-01 20:25:08.005 UTC: 	 Checking credentials
+DEBUG 2026-04-01 20:25:08.005 UTC: 	 Found proxy file /tmp/x509up_u171505
+DEBUG 2026-04-01 20:25:08.005 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2026-04-01 20:25:08.005 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u171505
+DEBUG 2026-04-01 20:25:08.043 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2026-04-01 20:25:08.044 UTC: 	 Getting proxy life time left
+DEBUG 2026-04-01 20:25:08.044 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u171505
+DEBUG 2026-04-01 20:25:08.072 UTC: 	 output : 42958
+42958
+
+ error: 
+ retcode : 0
+DEBUG 2026-04-01 20:25:08.072 UTC: 	 Proxy valid for 11:55:58 hours
+DEBUG 2026-04-01 20:25:08.073 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2026-04-01 20:25:08.121 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2026-04-01 20:25:08.121 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u171505
+DEBUG 2026-04-01 20:25:08.156 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=singhm/CN=877229/CN=Man Singh
+
+ error: 
+ retcode : 0
+DEBUG 2026-04-01 20:25:08.157 UTC: 	 Getting myproxy life time left for 17f6891be6269029ef04c8b26e1216e80a5fc23c
+DEBUG 2026-04-01 20:25:08.157 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 17f6891be6269029ef04c8b26e1216e80a5fc23c
+DEBUG 2026-04-01 20:25:08.439 UTC: 	 output : username: 17f6891be6269029ef04c8b26e1216e80a5fc23c
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=singhm/CN=877229/CN=Man Singh
+  renewal policy: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 488:15:29  (20.3 days)
+
+ error: 
+ retcode : 0
+DEBUG 2026-04-01 20:25:08.440 UTC: 	 Myproxy is valid: 1757700
+DEBUG 2026-04-01 20:25:08.440 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 17f6891be6269029ef04c8b26e1216e80a5fc23c  - validity: 20 days, 8:15:00
+DEBUG 2026-04-01 20:25:08.440 UTC: 	 Command use: submit
+DEBUG 2026-04-01 20:25:08.440 UTC: 	 Options use: ['-c', 'crab_config_pPb.py']
+DEBUG 2026-04-01 20:25:08.440 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 CRABClient version: v3.251020
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 Instance is prod
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 Command api workflow
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 Started submission
+DEBUG 2026-04-01 20:25:08.489 UTC: 	 Working on /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 Loading required information from the environment
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 Found CMSSW_8_0_24 for slc7_amd64_gcc530 with base /eos/home-s/singhm/OO_invM/CMSSW_8_0_24
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 Loading required information from the environment
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 Found CMSSW_8_0_24 for slc7_amd64_gcc530 with base /eos/home-s/singhm/OO_invM/CMSSW_8_0_24
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 UNIQUE NAME: tarUUID fd768b96-12bb-4a9b-9ca1-ed61acd9baaf 
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferLogs = True
+config.General.transferOutputs = True
+config.General.workArea = 'pPb_Data_AOD'
+config.General.requestName = '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'
+config.section_('JobType')
+config.JobType.psetName = 'pPb_2016_cfg_Corr.py'
+config.JobType.pluginName = 'Analysis'
+config.JobType.maxMemoryMB = 3000
+config.section_('Data')
+config.Data.inputDataset = '/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+config.Data.outputDatasetTag = '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'
+config.Data.totalUnits = -1
+config.Data.lumiMask = 'pPb_Collisions16_JSON.txt'
+config.Data.unitsPerJob = 4
+config.Data.inputDBS = 'phys03'
+config.Data.splitting = 'LumiBased'
+config.Data.outLFNDirBase = '/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb'
+config.Data.secondaryInputDataset = '/PAHighMultiplicity3/PARun2016C-PromptReco-v1/AOD'
+config.Data.publication = False
+config.section_('Site')
+config.Site.storageSite = 'T2_CH_CERN'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2026-04-01 20:25:08.578 UTC: 	 self.config.JobType.psetName: pPb_2016_cfg_Corr.py
+INFO 2026-04-01 20:25:08.578 UTC: 	 Importing CMSSW configuration pPb_2016_cfg_Corr.py
+INFO 2026-04-01 20:25:09.314 UTC: 	 Finished importing CMSSW configuration pPb_2016_cfg_Corr.py
+DEBUG 2026-04-01 20:25:09.314 UTC: 	 Writing CMSSW configuration to /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/PSet.py
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 The following EDM output files will be collected: []
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 The following TFile output files will be collected: ['cent_pPb_flow_jpsi.root']
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 The following user output files (not listed as PoolOuputModule or TFileService in the CMSSW PSet) will be collected: 
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 Loading required information from the environment
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 Found CMSSW_8_0_24 for slc7_amd64_gcc530 with base /eos/home-s/singhm/OO_invM/CMSSW_8_0_24
+DEBUG 2026-04-01 20:25:09.391 UTC: 	 Making tarball in /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/fd768b96-12bb-4a9b-9ca1-ed61acd9baafdefault.tgz
+DEBUG 2026-04-01 20:25:09.421 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/bin
+DEBUG 2026-04-01 20:25:09.421 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/bin to tarball
+DEBUG 2026-04-01 20:25:09.426 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/python
+DEBUG 2026-04-01 20:25:09.427 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/python to tarball
+DEBUG 2026-04-01 20:25:09.616 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/cfipython
+DEBUG 2026-04-01 20:25:09.617 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/cfipython to tarball
+DEBUG 2026-04-01 20:25:09.620 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/lib
+DEBUG 2026-04-01 20:25:09.620 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/lib to tarball
+DEBUG 2026-04-01 20:25:09.638 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/biglib
+DEBUG 2026-04-01 20:25:09.638 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/biglib to tarball
+DEBUG 2026-04-01 20:25:09.642 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/module
+DEBUG 2026-04-01 20:25:09.642 UTC: 	 Checking directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/config/SCRAM/hooks
+DEBUG 2026-04-01 20:25:12.101 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/data to tarball
+DEBUG 2026-04-01 20:25:12.942 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/interface to tarball
+DEBUG 2026-04-01 20:25:12.974 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/python to tarball
+DEBUG 2026-04-01 20:25:13.012 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/HeavyIonsAnalysis/Configuration/data to tarball
+DEBUG 2026-04-01 20:25:13.025 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/HeavyIonsAnalysis/Configuration/python to tarball
+DEBUG 2026-04-01 20:25:13.073 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/HeavyIonsAnalysis/VertexAnalysis/interface to tarball
+DEBUG 2026-04-01 20:25:13.077 UTC: 	 Adding directory /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/HeavyIonsAnalysis/VertexAnalysis/python to tarball
+DEBUG 2026-04-01 20:25:13.190 UTC: 	 Uploading archive /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/fd768b96-12bb-4a9b-9ca1-ed61acd9baafdefault.tgz (3.120117.1 MB) to the CRAB cache.
+DEBUG 2026-04-01 20:25:13.791 UTC: 	 Encoded data for curl request: tarballname=971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz&subresource=upload&objecttype=sandbox
+DEBUG 2026-04-01 20:25:13.847 UTC: 	 sandbox 971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz is already in the S3 store, will not upload again
+DEBUG 2026-04-01 20:25:13.847 UTC: 	 Loading required information from the environment
+DEBUG 2026-04-01 20:25:13.847 UTC: 	 Found CMSSW_8_0_24 for slc7_amd64_gcc530 with base /eos/home-s/singhm/OO_invM/CMSSW_8_0_24
+DEBUG 2026-04-01 20:25:13.847 UTC: 	 Making tarball in /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/debugFiles.tgz
+DEBUG 2026-04-01 20:25:13.871 UTC: 	 Uploading archive /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/debugFiles.tgz (2 KB) to the CRAB cache.
+DEBUG 2026-04-01 20:25:13.879 UTC: 	 Encoded data for curl request: tarballname=5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz&subresource=upload&objecttype=sandbox
+DEBUG 2026-04-01 20:25:13.948 UTC: 	 Will execute:
+curl -f -v -X POST  -H "User-Agent: CRAB" -F "key=singhm/sandboxes/5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz" -F "AWSAccessKeyId=715203df6482458ba839e73e6dab634b" -F "policy=eyJleHBpcmF0aW9uIjogIjIwMjYtMDQtMDFUMjE6MjU6MTNaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiY3JhYmNhY2hlX3Byb2QifSwgeyJrZXkiOiAic2luZ2htL3NhbmRib3hlcy81ZjA5MjY4ODg4YzJiN2NhODg0ZmY5ZTJiMzdmMDg1ZmYzNjM0OWZkMmE5NGJjYWZjZTU0MzA4ZGRkODhmMjg4LnRhci5neiJ9XX0=" -F "signature=Ge6mo/D/8tm6P22eLdN9N60FJKk=" -F "file=@/eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/debugFiles.tgz" "https://s3.cern.ch/crabcache_prod"
+DEBUG 2026-04-01 20:25:15.002 UTC: 	 exitcode: 0
+stdout: 
+DEBUG 2026-04-01 20:25:15.002 UTC: 	 upload to S3 of sandbox /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/debugFiles.tgz completed
+DEBUG 2026-04-01 20:25:15.003 UTC: 	 make sure that object is ready for retrieve
+DEBUG 2026-04-01 20:25:16.003 UTC: 	 Encoded data for curl request: tarballname=5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz&subresource=download&clientmethod=head_object&objecttype=sandbox
+DEBUG 2026-04-01 20:25:16.058 UTC: 	 PreSignedUrl to download sandbox received OK
+DEBUG 2026-04-01 20:25:16.061 UTC: 	 Will execute:
+ curl -v -s -f -o /dev/null --head  "https://s3.cern.ch/crabcache_prod/singhm/sandboxes/5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz?AWSAccessKeyId=715203df6482458ba839e73e6dab634b&Signature=3UD2ix058D5ccs9RKdpgZLspzoI%3D&Expires=1775078716"
+DEBUG 2026-04-01 20:25:16.092 UTC: 	 exitcode: 0
+stdout: 
+DEBUG 2026-04-01 20:25:16.092 UTC: 	 sandbox /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/inputs/debugFiles.tgz successfully uploaded to S3
+DEBUG 2026-04-01 20:25:16.092 UTC: 	 Result uploading input files: 971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz 
+DEBUG 2026-04-01 20:25:16.092 UTC: 	 Attaching lumi mask pPb_Collisions16_JSON.txt to the request
+DEBUG 2026-04-01 20:25:16.093 UTC: 	 Reading lumi-mask from pPb_Collisions16_JSON.txt
+DEBUG 2026-04-01 20:25:16.094 UTC: 	 submit() - self.configuration from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferLogs = True
+config.General.transferOutputs = True
+config.General.workArea = 'pPb_Data_AOD'
+config.General.requestName = '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'
+config.section_('JobType')
+config.JobType.psetName = 'pPb_2016_cfg_Corr.py'
+config.JobType.pluginName = 'Analysis'
+config.JobType.maxMemoryMB = 3000
+config.section_('Data')
+config.Data.inputDataset = '/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+config.Data.outputDatasetTag = '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'
+config.Data.totalUnits = -1
+config.Data.lumiMask = 'pPb_Collisions16_JSON.txt'
+config.Data.unitsPerJob = 4
+config.Data.inputDBS = 'phys03'
+config.Data.splitting = 'LumiBased'
+config.Data.outLFNDirBase = '/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb'
+config.Data.secondaryInputDataset = '/PAHighMultiplicity3/PARun2016C-PromptReco-v1/AOD'
+config.Data.publication = False
+config.section_('Site')
+config.Site.storageSite = 'T2_CH_CERN'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2026-04-01 20:25:16.095 UTC: 	 submit() - self.configreq {'maxjobruntime': 1250, 'extrajdl': [], 'lfn': '/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb', 'savelogsflag': 1, 'useparent': 0, 'inputblocks': [], 'asyncdest': 'T2_CH_CERN', 'algoargs': 4, 'numcores': 1, 'addoutputfiles': [], 'generator': 'pythia', 'maxmemory': 3000, 'partialdataset': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'priority': 10, 'userfiles': [], 'inputdata': '/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER', 'ignorelocality': 0, 'dryrun': 0, 'workflow': 'crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM', 'secondarydata': '/PAHighMultiplicity3/PARun2016C-PromptReco-v1/AOD', 'nonprodsw': 0, 'oneEventMode': 0, 'saveoutput': 1, 'publication': 0, 'totalunits': -1, 'splitalgo': 'LumiBased', 'ignoreglobalblacklist': 0, 'nonvaliddata': 0, 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader', 'jobtype': 'Analysis', 'requireaccelerator': 0, 'publishname2': '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'}
+DEBUG 2026-04-01 20:25:16.095 UTC: 	 submit() - jobconfig {'jobminuarch': 'any', 'runs': [u'285479', u'285480', u'285505', u'285517', u'285530', u'285537', u'285538', u'285539', u'285549', u'285684', u'285718', u'285726', u'285750', u'285759', u'285832'], 'lumis': ['1,8', '1,797', '94,528', '96,1572', '67,1540', '73,330', '1,124', '1,751', '112,414', '31,1151', '89,290', '1,481', '1,1239', '64,460', '79,1557'], 'tfileoutfiles': ['cent_pPb_flow_jpsi.root'], 'debugfilename': '5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz', 'cachefilename': '971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz', 'jobarch': 'slc7_amd64_gcc530', 'addoutputfiles': [], 'jobsw': 'CMSSW_8_0_24', 'edmoutfiles': [], 'inputdata': '/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER', 'jobtype': 'Analysis'}
+INFO 2026-04-01 20:25:16.095 UTC: 	 Sending the request to the server at cmsweb.cern.ch
+DEBUG 2026-04-01 20:25:16.095 UTC: 	 Submitting {'maxjobruntime': 1250, 'jobminuarch': 'any', 'extrajdl': [], 'lfn': '/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb', 'savelogsflag': 1, 'useparent': 0, 'inputblocks': [], 'asyncdest': 'T2_CH_CERN', 'algoargs': 4, 'cachefilename': '971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz', 'numcores': 1, 'addoutputfiles': [], 'generator': 'pythia', 'maxmemory': 3000, 'partialdataset': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'priority': 10, 'jobsw': 'CMSSW_8_0_24', 'edmoutfiles': [], 'userfiles': [], 'inputdata': '/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER', 'ignorelocality': 0, 'dryrun': 0, 'workflow': 'crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM', 'secondarydata': '/PAHighMultiplicity3/PARun2016C-PromptReco-v1/AOD', 'jobarch': 'slc7_amd64_gcc530', 'lumis': ['1,8', '1,797', '94,528', '96,1572', '67,1540', '73,330', '1,124', '1,751', '112,414', '31,1151', '89,290', '1,481', '1,1239', '64,460', '79,1557'], 'nonprodsw': 0, 'tfileoutfiles': ['cent_pPb_flow_jpsi.root'], 'oneEventMode': 0, 'debugfilename': '5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz', 'saveoutput': 1, 'publication': 0, 'runs': [u'285479', u'285480', u'285505', u'285517', u'285530', u'285537', u'285538', u'285539', u'285549', u'285684', u'285718', u'285726', u'285750', u'285759', u'285832'], 'totalunits': -1, 'splitalgo': 'LumiBased', 'ignoreglobalblacklist': 0, 'nonvaliddata': 0, 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader', 'jobtype': 'Analysis', 'requireaccelerator': 0, 'publishname2': '2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'} 
+DEBUG 2026-04-01 20:25:16.095 UTC: 	 Encoded data for curl request: maxjobruntime=1250&jobminuarch=any&lfn=%2Fstore%2Fgroup%2Fphys_heavyions%2Fsinghm%2FOO_Man%2F2pc_corr_pPb&savelogsflag=1&useparent=0&asyncdest=T2_CH_CERN&algoargs=4&cachefilename=971a004d8ef759fe2bec65e4c2e974e89a6ad1ffedb0e7f64dd3cc94154cb047.tar.gz&numcores=1&generator=pythia&maxmemory=3000&partialdataset=0&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&priority=10&jobsw=CMSSW_8_0_24&inputdata=%2FPAHighMultiplicity3%2Fsinghm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f%2FUSER&ignorelocality=0&dryrun=0&workflow=crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM&secondarydata=%2FPAHighMultiplicity3%2FPARun2016C-PromptReco-v1%2FAOD&jobarch=slc7_amd64_gcc530&nonprodsw=0&oneEventMode=0&debugfilename=5f09268888c2b7ca884ff9e2b37f085ff36349fd2a94bcafce54308ddd88f288.tar.gz&saveoutput=1&publication=0&totalunits=-1&splitalgo=LumiBased&ignoreglobalblacklist=0&nonvaliddata=0&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSReader&jobtype=Analysis&requireaccelerator=0&publishname2=2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM&tfileoutfiles=cent_pPb_flow_jpsi.root&runs=285479&runs=285480&runs=285505&runs=285517&runs=285530&runs=285537&runs=285538&runs=285539&runs=285549&runs=285684&runs=285718&runs=285726&runs=285750&runs=285759&runs=285832&lumis=1%2C8&lumis=1%2C797&lumis=94%2C528&lumis=96%2C1572&lumis=67%2C1540&lumis=73%2C330&lumis=1%2C124&lumis=1%2C751&lumis=112%2C414&lumis=31%2C1151&lumis=89%2C290&lumis=1%2C481&lumis=1%2C1239&lumis=64%2C460&lumis=79%2C1557
+DEBUG 2026-04-01 20:25:16.355 UTC: 	 Result: {u'result': [{u'RequestName': u'260401_202516:singhm_crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM'}]}
+INFO 2026-04-01 20:25:16.368 UTC: 	 Success: Your task has been delivered to the prod CRAB3 server.
+INFO 2026-04-01 20:25:16.369 UTC: 	 Task name: 260401_202516:singhm_crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM
+INFO 2026-04-01 20:25:16.369 UTC: 	 Project dir: pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM
+INFO 2026-04-01 20:25:16.369 UTC: 	 Please use ' crab status -d pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM ' to check how the submission process proceeds.
+DEBUG 2026-04-01 20:25:16.369 UTC: 	 About to return
+INFO 2026-04-01 20:25:16.393 UTC: 	 Log file is /eos/home-s/singhm/OO_invM/CMSSW_8_0_24/src/Analyzer/RaghuV0Ana/cfg/pPb_Data_AOD/crab_2pc_corr_ch_jpsi_in_pPb_20260312_v67_dataset3_flow_HM/crab.log

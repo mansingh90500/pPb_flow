@@ -1,0 +1,9 @@
+Will use CRAB configuration file crab_config2.py
+Importing CMSSW configuration PbPb_2018_cfg.py
+Finished importing CMSSW configuration PbPb_2018_cfg.py
+Sending the request to the server at cmsweb.cern.ch
+Success: Your task has been delivered to the prod CRAB3 server.
+Task name: 251007_222603:bibehera_crab_2pc_OO_V0_IM_effcorr_v1_cent0to50_IP53
+Project dir: OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_v1_cent0to50_IP53
+Please use ' crab status -d OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_v1_cent0to50_IP53 ' to check how the submission process proceeds.
+Log file is /eos/home-b/bibehera/OO_Simfit_eff/CMSSW_15_0_6_patch1/src/Analyzer/RaghuV0Ana/cfg/OO_Data_MINIAOD/crab_2pc_OO_V0_IM_effcorr_v1_cent0to50_IP53/crab.log

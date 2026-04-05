@@ -1,0 +1,141 @@
+import FWCore.ParameterSet.Config as cms
+process = cms.Process("RaghuV0Ana")
+# __________________ General _________________
+
+# Configure the logger
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+#process.load('Configuration.StandardSequences.MagneticField_cff')
+#process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
+#process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+#process.load('RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesRecovery_cfi')
+#process.load('RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi')
+#process.load("PhysicsTools.PatAlgos.slimming.packedPFCandidates_cff")
+process.load('RecoHI.HiEvtPlaneAlgos.HiEvtPlane_cfi')
+process.load('RecoHI.HiEvtPlaneAlgos.hiEvtPlaneFlat_cfi')
+
+# Configure the number of maximum event the analyser run on in interactive mode
+process.maxEvents = cms.untracked.PSet( 
+    input = cms.untracked.int32(-1) 
+    #input = cms.untracked.int32(2000) 
+    )
+
+# __________________ I/O files _________________
+process.source = cms.Source("PoolSource",
+    fileNames = cms.untracked.vstring(
+        #'/store/user/singhm/IonPhysics12/Onia_JPsi_skim_dataset12_20251116_v01/251222_185212/0000/onia2MuMuPAT_DATA1000_1.root'
+        #'/store/user/adattamu/PADoubleMuon/HISkim_JPsi_pPb_8TeV_data/241025_221109/0000/onia2MuMuPAT_DATA_80X_numEvent1000_21.root'
+        #'file:/eos/user/s/singhm/CMSSW_8_0_24/src/HiSkim/HiOnia2MuMu/test/onia2MuMuPAT_DATA_80X_.root'
+        #'file:/eos/user/s/singhm/CMSSW_8_0_24/src/HiSkim/HiOnia2MuMu/test/onia2MuMuPAT_DATA_80X__.root'
+        #'file:/eos/user/s/singhm/CMSSW_8_0_24/src/HiSkim/HiOnia2MuMu/test/onia2MuMuPAT_DATA_pPb80X.root'
+        #'file:/eos/user/s/singhm/CMSSW_8_0_24/src/HiSkim/HiOnia2MuMu/test/onia2MuMuPAT_DATA_pPb80XTest_trigger.root'
+        #'file:/eos/user/s/singhm/CMSSW_8_0_24/src/HiSkim/HiOnia2MuMu/test/onia2MuMuPAT_DATA_pPb80X_numEvent4000.root'
+        #'/store/user/adattamu/PADoubleMuon/HISkim_JPsi_pPb_8TeV_3/241020_183822/0000/onia2MuMuPAT_DATA_80X_22.root'
+        '/store/user/singhm/PAHighMultiplicity1/JPsi_HiSkim_pPb_2016_v2/260308_202326/0000/onia2MuMuPAT_DATA_pPb80X_11.root'
+        #'/store/user/singhm/PAHighMultiplicity3/JPsi_HiSkim_pPb_2016_HM_3_dataset/260309_124749/0000/onia2MuMuPAT_DATA_pPb80X_130.root'
+        #'/store/user/singhm/PAHighMultiplicity4/JPsi_HiSkim_pPb_2016_HM_4_dataset/260309_124937/0000/onia2MuMuPAT_DATA_pPb80X_10.root'
+    ),
+    secondaryFileNames = cms.untracked.vstring(
+        #'/store/hidata/OORun2025/IonPhysics12/MINIAOD/PromptReco-v1/000/394/153/00000/1af51e5c-75d0-45b8-9161-49e8928939f5.root'
+        #'/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/00888289-6AAF-E611-BB89-02163E011C5C.root' #Minimum bias
+        #'/store/hidata/PARun2016C/PAHighMultiplicity1/AOD/PromptReco-v1/000/285/505/00000/006F1E14-85AF-E611-9F9E-02163E014508.root' #HM
+        #'/store/user/singhm/PAHighMultiplicity1/JPsi_HiSkim_pPb_2016_v2/260308_202326/0000/onia2MuMuPAT_DATA_pPb80X_11.root'
+        '/store/hidata/PARun2016C/PAHighMultiplicity1/AOD/PromptReco-v1/000/285/505/00000/1C87A9F1-8DAF-E611-82E8-FA163EF22524.root'
+        #'/store/hidata/PARun2016C/PAHighMultiplicity1/AOD/PromptReco-v1/000/285/505/00000/1C67BAD8-83AF-E611-AA1C-02163E014280.root'
+        #'/store/hidata/PARun2016C/PAHighMultiplicity3/AOD/PromptReco-v1/000/285/517/00000/1E2BDF9D-50B0-E611-AB47-FA163E18AD50.root'
+        #'/store/hidata/PARun2016C/PAHighMultiplicity4/AOD/PromptReco-v1/000/285/505/00000/16AE5589-6FAF-E611-A96C-FA163EC0FD51.root'
+    )
+)
+
+# Define output file name
+import os
+process.TFileService = cms.Service("TFileService",
+        fileName = cms.string('cent_pPb_flow_jpsi.root')
+)
+
+process.options = cms.untracked.PSet(
+    Rethrow = cms.untracked.vstring('ProductNotFound')
+)
+
+# __________________ Detector conditions _________________
+
+# Configure the Global Tag
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+from Configuration.AlCa.GlobalTag import GlobalTag
+
+#process.GlobalTag = GlobalTag(process.GlobalTag, '150X_dataRun3_Prompt_v3', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_Prompt_v15', '') 
+process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+process.GlobalTag.toGet.extend([
+        cms.PSet(record = cms.string("HeavyIonRcd"),
+                 tag = cms.string("CentralityTable_HFtowers200_DataPbPb_periHYDJETshape_run2v1033p1x01_offline"),
+                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+                 label = cms.untracked.string("HFtowers")
+                 ),
+        ])
+#process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
+#process.centralityBin.Centrality = cms.InputTag("pACentrality")
+#process.centralityBin.centralityVariable = cms.string("HFtowers")
+#process.load('RecoHI.HiCentralityAlgos.CentralityFilter_cfi')
+
+# __________________ Event selection _________________                                               
+#process.load('HeavyIonsAnalysis.EventAnalysis.skimanalysis_cfi')
+
+process.load('HeavyIonsAnalysis.Configuration.collisionEventSelection_cff')
+#process.load('HeavyIonsAnalysis.EventAnalysis.hffilterPF_cfi')
+
+#process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+    #src = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    #cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2"), # && tracksSize >= 2"),                             
+    #filter = cms.bool(True),   # otherwise it won't filter the events                                   
+
+#)
+
+process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2"),
+    filter = cms.bool(True),
+)
+
+process.eventSelections = cms.Sequence(
+    #process.clusterCompatibilityFilter
+     process.primaryVertexFilter
+    #+ process.phfCoincFilterPF2Th4
+    )
+
+from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+process.hltfilter = hltHighLevel.clone(
+    HLTPaths = [
+        #"HLT_MinimumBiasHF_OR_BptxAND_v1"
+        "HLT_PAFullTracks_Multiplicity185*"
+        #"HLT_PAFullTracks_Multiplicity185_part*"
+        #"HLT_OxyL1SingleMuOpen_v1"
+    ]
+)
+    
+#from HeavyIonsAnalysis.TrackAnalysis.unpackedTracksAndVertices_cfi import *
+#process.unpackedTracksAndVertices = unpackedTracksAndVertices
+
+# __________________ Analyze Sequence _________________
+# Load you analyzer with initial configuration
+process.load("Analyzer.RaghuV0Ana.raghuv0ana_cff")
+#process.load("RaghuAna.Analyzer.raghuv0ana_cff") 
+process.RAGHUV0   = process.V0ana.clone()
+process.RAGHUV0.vertexSrc = cms.InputTag("offlinePrimaryVertices")
+process.RAGHUV0.packedCandidates = cms.InputTag("packedPFCandidates")
+process.RAGHUV0.trackAssociation = cms.InputTag("unpackedTracksAndVertices")
+process.RAGHUV0.tracksSrc = cms.InputTag("packedPFCandidates")
+process.RAGHUV0.recoTracksSrc = cms.InputTag("generalTracks")
+process.RAGHUV0.V0Src_jpsi = cms.InputTag("onia2MuMuPatGlbGlb", "", "Onia2MuMuPAT")
+# Inclusive multiplicity mode (all ntrack in one bin by default).
+process.RAGHUV0.ntrkbin_binedge = cms.untracked.vdouble(0, 100000)
+#process.RAGHUV0.isMC = cms.untracked.bool(False)
+
+process.p = cms.Path(process.eventSelections *
+                     process.hltfilter *
+                     process.RAGHUV0 )
+                     

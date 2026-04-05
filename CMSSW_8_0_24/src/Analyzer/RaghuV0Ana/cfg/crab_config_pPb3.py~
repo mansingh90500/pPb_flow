@@ -1,0 +1,75 @@
+from CRABAPI.RawCommand import crabCommand
+from WMCore.Configuration import Configuration
+from CRABClient.ClientExceptions import ClientException
+from httplib import HTTPException
+
+config = Configuration()
+
+# ===============================
+# General
+# ===============================
+config.section_("General")
+config.General.workArea = "pPb_Data_AOD"
+config.General.requestName = "2pc_corr_ch_jpsi_in_pPb_20260312_v33_dataset1_flow_HM"
+config.General.transferOutputs = True
+config.General.transferLogs = True
+
+# ===============================
+# JobType
+# ===============================
+config.section_("JobType")
+config.JobType.pluginName = "Analysis"
+config.JobType.psetName = "pPb_2016_cfg_Corr.py"
+config.JobType.maxMemoryMB = 3000
+config.JobType.maxJobRuntimeMin = 2750
+
+# ===============================
+# Data
+# ===============================
+config.section_("Data")
+
+config.Data.inputDBS = "phys03"
+
+config.Data.inputDataset = 
+"/PAHighMultiplicity1/singhm-JPsi_HiSkim_pPb_2016_v2-dba4c57409660a317caeae325a670af0/USER"
+#"/PAHighMultiplicity2/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER"
+#"/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER"
+#"/PAHighMultiplicity4/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER"
+#"/PAHighMultiplicity5/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER"
+#"/PAHighMultiplicity6/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER"
+config.Data.secondaryInputDataset = "/PAHighMultiplicity1/PARun2016C-PromptReco-v1/AOD"
+
+config.Data.splitting = "LumiBased"
+config.Data.unitsPerJob = 4
+config.Data.totalUnits = -1
+
+config.Data.publication = False
+
+config.Data.outputDatasetTag = "pPb_Jpsi_flow_2016"
+
+config.Data.outLFNDirBase = "/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb"
+
+config.Data.lumiMask = "pPb_Collisions16_JSON.txt"
+
+# ===============================
+# Site
+# ===============================
+config.section_("Site")
+config.Site.storageSite = "T2_CH_CERN"
+
+# ===============================
+# Submission
+# ===============================
+if __name__ == "__main__":
+
+    try:
+        crabCommand("submit", config=config)
+
+    except HTTPException as hte:
+        print("Failed submitting task (HTTP): %s" % hte)
+
+    except ClientException as cle:
+        print("Failed submitting task (Client): %s" % cle)
+
+    except Exception as e:
+        print("Failed submitting task (Other): %s" % e)

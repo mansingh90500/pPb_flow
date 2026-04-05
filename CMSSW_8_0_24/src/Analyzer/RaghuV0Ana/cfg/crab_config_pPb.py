@@ -1,0 +1,57 @@
+from CRABAPI.RawCommand import crabCommand
+from WMCore.Configuration import Configuration
+from CRABClient.ClientExceptions import ClientException
+from httplib import HTTPException
+#from http.client import HTTPException
+
+config = Configuration()
+
+# === General ===
+config.section_('General')
+config.General.workArea = 'pPb_Data_AOD'
+config.General.requestName = '2pc_corr_ch_jpsi_in_Pbp_20260402_v69_dataset1_flow_HM'
+config.General.transferLogs = True
+config.General.transferOutputs = True
+
+# === JobType ===
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+#config.JobType.psetName = 'pPb_2025_cfg_Jpsi_Corr.py'
+#config.JobType.psetName = 'pPb_2016_cfg_Corr.py'
+config.JobType.psetName = 'pPb_2016_cfg_Corr_backupWithHLT.py'
+config.JobType.maxMemoryMB = 3000
+
+# === Data ===
+config.section_('Data')
+config.Data.inputDBS = 'phys03'
+config.Data.splitting = 'LumiBased'
+config.Data.unitsPerJob = 4
+config.Data.totalUnits = -1
+config.Data.publication = False
+
+config.Data.inputDataset = (
+    #'/PADoubleMuon/adattamu-HISkim_JPsi_pPb_8TeV_3-d95486b0df14ef473ea75ebd5103422c/USER'
+    #'/PAHighMultiplicity1/singhm-JPsi_HiSkim_pPb_2016_v1-69ce5f9ad4757484cb23f2e3960d94e3/USER'
+    '/PAHighMultiplicity1/singhm-JPsi_HiSkim_pPb_2016_v2-dba4c57409660a317caeae325a670af0/USER'
+    #'/PAHighMultiplicity2/singhm-JPsi_HiSkim_pPb_2016_HM_2_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+    #'/PAHighMultiplicity3/singhm-JPsi_HiSkim_pPb_2016_HM_3_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+    #'/PAHighMultiplicity4/singhm-JPsi_HiSkim_pPb_2016_HM_4_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+    #'/PAHighMultiplicity5/singhm-JPsi_HiSkim_pPb_2016_HM_5_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+    #'/PAHighMultiplicity6/singhm-JPsi_HiSkim_pPb_2016_HM_6_dataset-4e95cfdfa2904e9c713dbc817dd5c93f/USER'
+)
+
+config.Data.secondaryInputDataset = (
+    #'/PADoubleMuon/PARun2016C-PromptReco-v1/AOD'
+    '/PAHighMultiplicity1/PARun2016C-PromptReco-v1/AOD'
+)
+
+config.Data.outputDatasetTag = config.General.requestName
+config.Data.outLFNDirBase = '/store/group/phys_heavyions/singhm/OO_Man/2pc_corr_pPb'
+config.Data.lumiMask = 'Pbp_Collisions16_JSON.txt'
+# === Site ===
+config.section_('Site')
+config.Site.storageSite = 'T2_CH_CERN'
+
+config.section_('User')
+config.section_('Debug')
+

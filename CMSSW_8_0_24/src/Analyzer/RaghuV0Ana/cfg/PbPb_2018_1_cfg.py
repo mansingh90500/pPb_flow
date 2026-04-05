@@ -1,0 +1,138 @@
+import FWCore.ParameterSet.Config as cms
+from input_primary_V0 import input_files
+from input_secondary import input_files2
+process = cms.Process("RaghuV0Ana")
+
+
+# __________________ General _________________
+
+# Configure the logger
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+process.load('Configuration.StandardSequences.MagneticField_cff')
+process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
+#process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+#process.load('RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesRecovery_cfi')
+#process.load('RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi')
+
+process.load('RecoHI.HiEvtPlaneAlgos.HiEvtPlane_cfi')
+process.load('RecoHI.HiEvtPlaneAlgos.hiEvtPlaneFlat_cfi')
+
+# Configure the number of maximum event the analyser run on in interactive mode
+# -1 == ALL
+process.maxEvents = cms.untracked.PSet( 
+    input = cms.untracked.int32(-1) 
+   # input = cms.untracked.int32(1000) 
+    )
+
+# __________________ I/O files _________________
+
+process.source = cms.Source("PoolSource",
+                            fileNames = cms.untracked.vstring(
+                                input_files
+#"root://cms-xrd-global.cern.ch://store/user/qwang/V0Production2018/HIMinimumBias4/V0Skim_v3/190827_145751/0001/reco_1087.root" #--HM4
+#"/store/group/phys_heavyions/qwang/V0Production2018/MinBias_Hydjet_Drum5F_2018_5p02TeV/crab_HydjetDrum5F_RECODEBUG_V0Skim_v2/190903_212414/0000/reco_Hydjet_1.root"
+#"/store/user/bibehera/IonPhysics0/V0_OO_IP0_Run2025_MiniAOD/250724_195542/0000/OO_KS_LM_Test_data_1.root"
+        ),
+                            secondaryFileNames = cms.untracked.vstring(
+                                input_files2
+#'root://cms-xrd-global.cern.ch://store/hidata/HIRun2018A/HIMinimumBias4/AOD/04Apr2019-v1/240006/F6653E6D-7A54-4743-AB66-8CD0E890141C.root' #--HM4
+#'/store/hidata/OORun2025/IonPhysics0/MINIAOD/PromptReco-v1/000/394/183/00000/796c5018-38b9-41c9-bd12-5a60b3183c5c.root'
+#'/store/user/clindsey/MinBias_Hydjet_Drum5F_2018_5p02TeV/RECODEBUG_20190625/190626_194626/0000/step2_RAW2DIGI_L1Reco_RECO_1.root',
+#'/store/user/clindsey/MinBias_Hydjet_Drum5F_2018_5p02TeV/RECODEBUG_20190625/190626_194626/0000/step2_RAW2DIGI_L1Reco_RECO_10.root',
+#'/store/user/clindsey/MinBias_Hydjet_Drum5F_2018_5p02TeV/RECODEBUG_20190625/190626_194626/0000/step2_RAW2DIGI_L1Reco_RECO_100.root',
+#'/store/user/clindsey/MinBias_Hydjet_Drum5F_2018_5p02TeV/RECODEBUG_20190625/190626_194626/0000/step2_RAW2DIGI_L1Reco_RECO_101.root',
+#'/store/user/clindsey/MinBias_Hydjet_Drum5F_2018_5p02TeV/RECODEBUG_20190625/190626_194626/0000/step2_RAW2DIGI_L1Reco_RECO_102.root'
+#'/store/hidata/HIRun2018A/HIMinimumBias1/AOD/04Apr2019-v1/250001/B4FE745F-5BAA-4F4D-8C83-855E8AC950A5.root' #--HM1
+),
+                            )     
+
+
+
+# Define output file name
+import os
+process.TFileService = cms.Service("TFileService",
+         #fileName = cms.string('KS_daucut_check_reco_match.root')
+         fileName = cms.string('V0_test.root')
+)
+#process.options = cms.untracked.PSet(
+#SkipEvent = cms.untracked.vstring('ProductNotFound')
+#)
+process.options = cms.untracked.PSet(
+    #wantSummary = cms.untracked.bool(True),
+    Rethrow = cms.untracked.vstring('ProductNotFound')
+    #TryToContinue = cms.untracked.vstring('ProductNotFound')
+)
+
+# __________________ Detector conditions _________________
+
+# Configure the Global Tag
+
+#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+#from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_v2', '')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+from Configuration.AlCa.GlobalTag import GlobalTag
+
+process.GlobalTag = GlobalTag(process.GlobalTag, '150X_dataRun3_Prompt_v3', '')
+
+process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+process.GlobalTag.toGet.extend([
+        cms.PSet(record = cms.string("HeavyIonRcd"),
+                 tag = cms.string("CentralityTable_HFtowers200_DataPbPb_periHYDJETshape_run2v1033p1x01_offline"),
+                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+                 label = cms.untracked.string("HFtowers")
+                 ),
+        ])
+process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
+process.centralityBin.Centrality = cms.InputTag("hiCentrality")
+process.centralityBin.centralityVariable = cms.string("HFtowers")
+process.load('RecoHI.HiCentralityAlgos.CentralityFilter_cfi')
+#process.load('HeavyIonsAnalysis.Configuration.collisionEventSelection_cff')
+#process.load('HeavyIonsAnalysis.Configuration.hfCoincFilter_cff')
+
+# __________________ Event selection _________________                                                                                                     
+process.load('HeavyIonsAnalysis.EventAnalysis.skimanalysis_cfi')
+process.load('HeavyIonsAnalysis.EventAnalysis.collisionEventSelection_cff')
+process.load('HeavyIonsAnalysis.EventAnalysis.hffilterPF_cfi')
+
+process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+    src = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2"), # && tracksSize >= 2"),                             
+    filter = cms.bool(True),   # otherwise it won't filter the events                                   
+
+)
+process.eventSelections = cms.Sequence(
+    process.clusterCompatibilityFilter
+    + process.primaryVertexFilter
+    + process.phfCoincFilterPF2Th4
+    )
+
+from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+process.hltfilter = hltHighLevel.clone(
+    HLTPaths = [
+        "HLT_MinimumBiasHF_OR_BptxAND_v1"
+
+    ]
+)
+    
+from HeavyIonsAnalysis.TrackAnalysis.unpackedTracksAndVertices_cfi import *
+process.unpackedTracksAndVertices = unpackedTracksAndVertices
+
+# __________________ Analyze Sequence _________________
+# Load you analyzer with initial configuration
+process.load("Analyzer.RaghuV0Ana.raghuv0ana_cff")
+#process.load("RaghuAna.Analyzer.raghuv0ana_cff") 
+process.RAGHUV0   = process.V0ana.clone()
+#process.RAGHUV0.isMC = cms.untracked.bool(False)
+
+process.p = cms.Path(process.eventSelections *
+                     #process.centralityBin *
+                     process.hltfilter *
+                     process.unpackedTracksAndVertices *
+                     process.RAGHUV0 )
+                     
