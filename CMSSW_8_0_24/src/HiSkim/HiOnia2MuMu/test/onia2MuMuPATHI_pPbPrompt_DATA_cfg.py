@@ -1,0 +1,279 @@
+# for the list of used tags please see:
+# https://twiki.cern.ch/twiki/bin/view/CMS/Onia2MuMuSamples
+
+import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
+
+#----------------------------------------------------------------------------
+
+# Setup Settings for ONIA SKIM:
+
+ispPb         = True      # if PbPb data/MC: True or if pp data/MC: False    
+isMC           = False     # if input is MONTECARLO: True or if it's DATA: False
+isPromptDATA   = True      # if input is Prompt RECO DATA: True or if it's Express Stream DATA: False
+keepExtraColl  = True     # General Tracks + Stand Alone Muons + Converted Photon collections
+applyEventSel  = True      # if we want to apply Event Selection
+muonSelection  = "Trk"  # Single muon selection: Glb(isGlobal), GlbTrk(isGlobal&&isTracker), Trk(isTracker) are availale
+
+#----------------------------------------------------------------------------
+
+
+# Print Onia Skim settings:
+if (isPromptDATA and isMC): raise SystemExit("[ERROR] isMC and isPromptDATA can not be true at the same time, please fix your settings!.")
+print( " " ) 
+print( "[INFO] Settings used for ONIA SKIM: " )  
+print( "[INFO] ispPb        = " + ("True" if ispPb else "False") )  
+print( "[INFO] isMC          = " + ("True" if isMC else "False") )  
+print( "[INFO] isPromptDATA  = " + ("True" if isPromptDATA else "False") )  
+print( "[INFO] keepExtraColl = " + ("True" if keepExtraColl else "False") ) 
+print( "[INFO] applyEventSel = " + ("True" if applyEventSel else "False") )  
+print( "[INFO] muonSelection = " + muonSelection )  
+print( " " ) 
+
+# set up process
+process = cms.Process("Onia2MuMuPAT")
+# load global Tag
+#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_Prompt_v14', '')
+
+# load offline CASTOR conditions
+process.load("CondCore.DBCommon.CondDBSetup_cfi") 
+process.CastorDbProducer = cms.ESProducer("CastorDbProducer") 
+# 
+process.es_ascii = cms.ESSource("CastorTextCalibrations", 
+   input = cms.VPSet( 
+       #cms.PSet( 
+            #object = cms.string('Gains'), 
+            #file = cms.FileInPath('CalibCalorimetry/CastorCalib/data/calibrations.txt') 
+            #file = cms.FileInPath('data/CastorConditions/calibrations.txt') 
+        #), 
+       #cms.PSet( 
+           #object = cms.string('ChannelQuality'), 
+           #file = cms.FileInPath('CalibCalorimetry/CastorCalib/data/channelquality.txt') 
+           #file = cms.FileInPath('data/CastorConditions/channelquality.txt') 
+       #), 
+#       cms.PSet( 
+#            object = cms.string('SaturationCorrs'), 
+#            file = cms.FileInPath('path/to/the/updated/text/saturationcorrections.txt') 
+#        ), 
+   ) 
+)
+#process.es_prefer_castor = cms.ESPrefer('CastorTextCalibrations','es_ascii') 
+# Castor ReReco
+process.load('RecoLocalCalo.Castor.Castor_cff')
+process.rechitcorrector = cms.EDProducer("RecHitCorrector",
+        rechitLabel = cms.InputTag("castorreco","","RECO"), # choose the original RecHit collection
+        revertFactor = cms.double(1),
+        doInterCalib = cms.bool(True)
+       ) # do intercalibration
+process.CastorTowerReco.inputprocess = "rechitcorrector"
+process.CastorReReco = cms.Path(process.rechitcorrector*process.CastorFullReco)
+
+
+# setup 'analysis'  options
+options = VarParsing.VarParsing ('analysis')
+
+# setup any defaults you want
+#fileNames = cms.untracked.vstring('root://cms-xrd-global.cern.ch//store/hidata/PARun2016C/PAForward/AOD/PromptReco-v1/000/285/517/00000/DADC048E-2CB0-E611-8ADA-02163E012589.root')
+#options.inputFiles ='root://cms-xrd-global.cern.ch//store/hidata/PARun2016C/PAForward/AOD/PromptReco-v1/000/285/505/00000/027E73D6-84AF-E611-817F-FA163EEF6D32.root'
+#options.inputFiles ='root://cms-xrd-global.cern.ch//store/hidata/PARun2016C/PAForward/AOD/PromptReco-v1/000/285/505/00000/027E73D6-84AF-E611-817F-FA163EEF6D32.root','root://cms-xrd-global.cern.ch//store/hidata/PARun2016C/PAForward/AOD/PromptReco-v1/000/285/447/00000/2A560704-8DAE-E611-9736-02163E0141DC.root'
+#'root://cms-xrd-global.cern.ch//store/hidata/PARun2016C/PAForward/AOD/PromptReco-v1/000/285/505/00000/3259DDC2-87AF-E611-ADE8-02163E0146AA.root'
+#options.inputFiles = '/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/00888289-6AAF-E611-BB89-02163E011C5C.root'
+#options.inputFiles = '/store/hidata/PARun2016C/PAHighMultiplicity1/AOD/PromptReco-v1/000/285/505/00000/006F1E14-85AF-E611-9F9E-02163E014508.root'
+'''
+options.inputFiles =  '/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/00888289-6AAF-E611-BB89-02163E011C5C.root',
+'/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/9CDE7693-79AF-E611-B405-FA163ECE0FC7.root',
+'/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/B0765286-68AF-E611-B201-FA163E1F9CB2.root',
+'/store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/DC80CC93-69AF-E611-A595-FA163ED00180.root'
+'''
+#options.inputFiles =  '/store/hidata/PARun2016C/PAHighMultiplicity1/AOD/PromptReco-v1/000/285/505/00000/006F1E14-85AF-E611-9F9E-02163E014508.root'
+
+options.inputFiles = [
+    'root://xrootd-cms.infn.it//store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/00888289-6AAF-E611-BB89-02163E011C5C.root',
+    'root://xrootd-cms.infn.it//store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/9CDE7693-79AF-E611-B405-FA163ECE0FC7.root',
+    'root://xrootd-cms.infn.it//store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/B0765286-68AF-E611-B201-FA163E1F9CB2.root',
+    'root://xrootd-cms.infn.it//store/hidata/PARun2016C/PADoubleMuon/AOD/PromptReco-v1/000/285/505/00000/DC80CC93-69AF-E611-A595-FA163ED00180.root'
+]
+options.outputFile = 'onia2MuMuPAT_DATA_pPb80X_1_test.root'
+
+options.maxEvents = -1 # -1 means all events
+#options.maxEvents = 10000 # -1 means all events
+
+# get and parse the command line arguments
+options.parseArguments()
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+
+# load the Geometry and Magnetic Field for the TransientTrackBuilder
+process.load('Configuration.StandardSequences.Services_cff')
+process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff')
+
+# Global Tag
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_Prompt_v15', '')
+process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")  # Needed to avoid trigger prescale errors.
+
+
+#HLT_PAUpcSingleEG5Pixel_TrackVeto_v1# Centrality for pPb
+process.load('RecoHI.HiCentralityAlgos.pACentrality_cfi')
+
+HLTProName = "HLT"
+# HLT Dimuon Triggers
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+process.hltOniaHI = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+if ispPb:
+  # HLT PbPbP MENU:  /cdaq/physics/Run2015HI/HeavyIon/500Bunches/v8.0/HLT/V7
+ process.hltOniaHI.HLTPaths =  [
+    "HLT_PADoubleMuOpen_HFOneTowerVeto_v1",
+    "HLT PAFullTracks Multiplicity120",
+    "HLT PAFullTracks Multiplicity185",
+  "HLT_PADoubleMuOpen_HFOneTowerVeto_SingleTrack_v1",
+    "HLT_PADoubleMuOpen_HFTwoTowerVeto_v1",
+    "HLT_PADoubleMuOpen_HFTwoTowerVeto_SingleTrack_v1",
+    "HLT_PASingleMuOpen_HFOneTowerVeto_v1",
+    "HLT_PASingleMuOpen_HFOneTowerVeto_SingleTrack_v1",
+    "HLT_PASingleMuOpen_HFTwoTowerVeto_v1",
+    "HLT_PASingleMuOpen_HFTwoTowerVeto_SingleTrack_v1",
+    "HLT_PASingleMuOpen_PixelTrackGt0Lt10_v1",
+    "HLT_PASingleMuOpen_PixelTrackGt0Lt15_v1",
+    "HLT_PASingleMuOpen_PixelTrackGt0_FullTrackLt10_v1",
+    "HLT_PASingleMuOpen_PixelTrackGt0_FullTrackLt15_v1"
+ ]
+else:
+  # HLT PP MENU: /users/HiMuonTrigDev/pp5TeV/NovDev/V4
+  process.hltOniaHI.HLTPaths = [
+    "HLT_HIL1DoubleMu0_v1",
+    #"HLT PAFullTracks Multiplicity120",
+    #"HLT PAFullTracks Multiplicity185",
+    "HLT_HIL1DoubleMu10_v1",
+    "HLT_HIL2DoubleMu0_NHitQ_v1",
+    "HLT_HIL3DoubleMu0_OS_m2p5to4p5_v1",
+    "HLT_HIL3DoubleMu0_OS_m7to14_v1",
+    "HLT_HIL2Mu3_NHitQ10_v1",
+    "HLT_HIL3Mu3_NHitQ15_v1",
+    "HLT_HIL2Mu5_NHitQ10_v1",
+    "HLT_HIL3Mu5_NHitQ15_v1",
+    "HLT_HIL2Mu7_NHitQ10_v1",
+    "HLT_HIL3Mu7_NHitQ15_v1",
+    "HLT_HIL2Mu15_v1",
+    "HLT_HIL3Mu15_v1",
+    "HLT_HIL2Mu20_v1",
+    "HLT_HIL3Mu20_v1"
+    ]
+process.hltOniaHI.throw = False
+process.hltOniaHI.andOr = True
+process.hltOniaHI.TriggerResultsTag = cms.InputTag("TriggerResults","",HLTProName)
+
+from HiSkim.HiOnia2MuMu.onia2MuMuPAT_cff import *
+onia2MuMuPAT(process, GlobalTag=process.GlobalTag.globaltag, MC=isMC, HLT=HLTProName, Filter=True)
+
+### Temporal fix for the PAT Trigger prescale warnings.
+#process.patTriggerFull.l1GtReadoutRecordInputTag = cms.InputTag("gtDigis","","RECO")
+###
+
+##### Onia2MuMuPAT input collections/options
+process.onia2MuMuPatGlbGlb.dimuonSelection          = cms.string("mass > 0")
+process.onia2MuMuPatGlbGlb.resolvePileUpAmbiguity   = False
+if ispPb:
+#  process.onia2MuMuPatGlbGlb.srcTracks                = cms.InputTag("hiGeneralTracks")
+  process.onia2MuMuPatGlbGlb.srcTracks                = cms.InputTag("generalTracks")
+  process.onia2MuMuPatGlbGlb.primaryVertexTag         = cms.InputTag("offlinePrimaryVertices")
+  process.patMuonsWithoutTrigger.pvSrc                = cms.InputTag("offlinePrimaryVertices")
+#  process.onia2MuMuPatGlbGlb.primaryVertexTag         = cms.InputTag("hiSelectedVertex")
+#  process.patMuonsWithoutTrigger.pvSrc                = cms.InputTag("hiSelectedVertex")
+  process.onia2MuMuPatGlbGlb.addMuonlessPrimaryVertex = False
+else: # ispp
+  process.onia2MuMuPatGlbGlb.srcTracks                = cms.InputTag("generalTracks")
+  process.onia2MuMuPatGlbGlb.primaryVertexTag         = cms.InputTag("offlinePrimaryVertices")
+  process.patMuonsWithoutTrigger.pvSrc                = cms.InputTag("offlinePrimaryVertices")
+  # Adding muonLessPV gives you lifetime values wrt. muonLessPV only
+  process.onia2MuMuPatGlbGlb.addMuonlessPrimaryVertex = True
+if isMC:
+  process.genMuons.src = "genParticles"
+  process.onia2MuMuPatGlbGlb.genParticles = "genParticles"
+
+##### Dimuon pair selection
+commonP1 = ""
+commonP2 = ""
+if muonSelection == "Glb":
+  highP = "isGlobalMuon"; # At least one muon must pass this selection
+  process.onia2MuMuPatGlbGlb.higherPuritySelection = cms.string("("+highP+commonP1+")"+commonP2)
+  lowP = "isGlobalMuon"; # BOTH muons must pass this selection
+  process.onia2MuMuPatGlbGlb.lowerPuritySelection = cms.string("("+lowP+commonP1+")"+commonP2)
+elif muonSelection == "GlbTrk":
+  highP = "(isGlobalMuon && isTrackerMuon)";
+  process.onia2MuMuPatGlbGlb.higherPuritySelection = cms.string("("+highP+commonP1+")"+commonP2)
+  lowP = "(isGlobalMuon && isTrackerMuon)";
+  process.onia2MuMuPatGlbGlb.lowerPuritySelection = cms.string("("+lowP+commonP1+")"+commonP2)
+elif muonSelection == "Trk":
+  highP = "isTrackerMuon";
+  process.onia2MuMuPatGlbGlb.higherPuritySelection = cms.string("("+highP+commonP1+")"+commonP2)
+  lowP = "isTrackerMuon";
+  process.onia2MuMuPatGlbGlb.lowerPuritySelection = cms.string("("+lowP+commonP1+")"+commonP2)
+else:
+  print "ERROR: Incorrect muon selection " + muonSelection + " . Valid options are: Glb, Trk, GlbTrk"
+
+
+##### Event Selection
+if applyEventSel:
+  if ispPb:
+    process.PAprimaryVertexFilter = cms.EDFilter("VertexSelector",
+                                                 src = cms.InputTag("offlinePrimaryVertices"),
+                                                 cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2 && tracksSize >= 2"),
+                                                 filter = cms.bool(True),
+                                                 )
+    process.patMuonSequence.replace(process.hltOniaHI , process.hltOniaHI * process.PAprimaryVertexFilter )
+  else:
+    process.PAprimaryVertexFilter = cms.EDFilter("VertexSelector",
+                                                 src = cms.InputTag("offlinePrimaryVertices"),
+                                                 cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2 && tracksSize >= 2"),
+                                                 filter = cms.bool(True),
+                                                 )
+    process.NoScraping = cms.EDFilter("FilterOutScraping",
+                                      applyfilter = cms.untracked.bool(True),
+                                      debugOn = cms.untracked.bool(False),
+                                      numtrack = cms.untracked.uint32(10),
+                                      thresh = cms.untracked.double(0.25),
+                                      )
+    process.patMuonSequence.replace(process.hltOniaHI , process.hltOniaHI * process.PAprimaryVertexFilter * process.NoScraping )
+
+##### Remove few paths for MC
+if isMC:
+  process.patMuonSequence.remove(process.hltOniaHI)
+
+##### If extra collections has to be kept
+if keepExtraColl:
+#  if ispPb: process.outOnia2MuMu.outputCommands.append("keep *_hiGeneralTracks_*_*")
+#  else: process.outOnia2MuMu.outputCommands.append("keep *_generalTracks_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_generalTracks_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_standAloneMuons_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_towerMaker_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_Castor*Reco_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_castorreco_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_rechitcorrector_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_offlinePrimaryVertices_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep recoConversions_*_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_conversions_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_mustacheConversions_*_*")
+#  process.outOnia2MuMu.outputCommands.append("drop *_conversions_uncleanedConversions_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_gedPhotonCore_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_gedPhotonsTmp_*_*")
+#  process.outOnia2MuMu.outputCommands.append("keep *_gedPhotons_*_*")
+  process.outOnia2MuMu.outputCommands.append("keep *_pACentrality_*_*")
+
+
+
+process.source.fileNames      = cms.untracked.vstring(options.inputFiles)        
+process.maxEvents             = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+process.outOnia2MuMu.fileName = cms.untracked.string( options.outputFile )
+process.e                     = cms.EndPath(process.outOnia2MuMu)
+process.schedule              = cms.Schedule(process.CastorReReco,process.Onia2MuMuPAT,process.e)
+#process.schedule              = cms.Schedule(process.Onia2MuMuPAT,process.e)
+
+from Configuration.Applications.ConfigBuilder import MassReplaceInputTag
+MassReplaceInputTag(process)
