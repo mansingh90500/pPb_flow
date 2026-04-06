@@ -234,9 +234,9 @@ void plot()
             Y  = B00 * S / B;
             eY = Y * std::sqrt((eS / S) * (eS / S) + (eB / B) * (eB / B));
         } else if (B > 0.0) {
-            // S==0 case: yield is 0 but propagate B error
+            // S==0 case: yield is 0; propagate signal statistical uncertainty
             Y  = 0.0;
-            eY = B00 * eS / B;
+            eY = (B00 / B) * eS;
         }
         hYield->SetBinContent(ib, Y);
         hYield->SetBinError(ib, eY);
@@ -391,7 +391,7 @@ void plot()
     TLegend *leg2 = new TLegend(0.50, 0.75, 0.93, 0.90);
     leg2->SetTextSize(0.044);
     leg2->AddEntry(hYield,
-        "Y(#Delta#phi) = B(0,0)#timesS/#hat{B}", "ep");
+        "Y(#Delta#phi) = B(0,0)#timesS/B(#Delta#phi)", "ep");
     leg2->Draw();
 
     // ------- Panel 3: Correlation function C(Δφ) -------------------------
